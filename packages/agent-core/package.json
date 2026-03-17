@@ -1,0 +1,30 @@
+{
+  "name": "@agentledger/agent-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "demo": "tsx src/run-demo.ts",
+    "e2e": "tsx src/run-e2e-agents.ts",
+    "orchestrator": "tsx src/run-orchestrator.ts",
+    "worker": "tsx src/run-worker.ts",
+    "sentinel": "tsx src/run-sentinel.ts",
+    "mcp": "tsx src/mcp/server.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^1.2.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@x402/evm": "^2.7.0",
+    "@x402/fetch": "^2.7.0",
+    "ai": "^4.3.0",
+    "dotenv": "^16.4.7",
+    "viem": "^2.23.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
