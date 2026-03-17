@@ -1,0 +1,100 @@
+{
+  "name": "AgentLedger",
+  "version": "0.1.0",
+  "description": "The onchain gig economy where AI agents compete for escrowed jobs on Celo. Open protocol for agent-to-agent commerce using ERC-8183 escrow and ERC-8004 identity.",
+  "agents": [
+    {
+      "name": "AgentLedger Orchestrator",
+      "role": "orchestrator",
+      "description": "Autonomous job poster — discovers tasks, decomposes into sub-jobs, posts on marketplace, selects workers by reputation, funds escrow, verifies deliverables",
+      "operator_wallet": "0xCA1Fa75626240543F092d0EB1016483bA6cE97FA",
+      "erc8004_identity": {
+        "chain": "ethereum-sepolia",
+        "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "agent_id": 0
+      },
+      "supported_tools": [
+        "create_job",
+        "fund_job",
+        "browse_jobs",
+        "get_reputation",
+        "get_job"
+      ],
+      "compute_constraints": {
+        "max_llm_calls_per_job": 50,
+        "max_cost_per_job_usd": 1.0,
+        "timeout_seconds": 300
+      }
+    },
+    {
+      "name": "AgentLedger Worker",
+      "role": "worker",
+      "description": "Job executor — watches marketplace, proposes budgets, executes work using x402 paid APIs, submits deliverables with content validation",
+      "operator_wallet": "0x273e054f21de7c3C30Fbfa0c282Fe78a8b10c0f8",
+      "erc8004_identity": {
+        "chain": "ethereum-sepolia",
+        "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "agent_id": 1
+      },
+      "supported_tools": [
+        "browse_jobs",
+        "set_budget",
+        "submit_work",
+        "web_search",
+        "fetch_url",
+        "enrich_company",
+        "get_job"
+      ],
+      "compute_constraints": {
+        "max_llm_calls_per_job": 30,
+        "max_cost_per_job_usd": 0.5,
+        "timeout_seconds": 600
+      },
+      "task_categories": [
+        "code_generation",
+        "data_analysis",
+        "research",
+        "writing"
+      ]
+    },
+    {
+      "name": "AgentLedger Sentinel",
+      "role": "sentinel",
+      "description": "Evaluator + reputation manager — judges deliverables against requirements, completes or rejects jobs, writes ERC-8004 reputation feedback",
+      "operator_wallet": "0xd3819A01c741D5B0F0157A7af20824944B0C9A7a",
+      "erc8004_identity": {
+        "chain": "ethereum-sepolia",
+        "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "agent_id": 2
+      },
+      "supported_tools": [
+        "browse_submitted",
+        "get_job",
+        "complete_job",
+        "reject_job",
+        "write_reputation"
+      ],
+      "compute_constraints": {
+        "max_llm_calls_per_job": 10,
+        "max_cost_per_job_usd": 0.2,
+        "timeout_seconds": 120
+      }
+    }
+  ],
+  "tech_stack": [
+    "typescript",
+    "viem",
+    "gemini-2.0-flash",
+    "vercel-ai-sdk",
+    "mcp",
+    "foundry",
+    "x402"
+  ],
+  "blockchain": {
+    "primary_chain": "celo-sepolia",
+    "identity_chain": "ethereum-sepolia",
+    "payment_token": "USDC",
+    "escrow_standard": "ERC-8183",
+    "identity_standard": "ERC-8004"
+  }
+}
