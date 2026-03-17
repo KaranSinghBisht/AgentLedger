@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Foundry
+out/
+cache/
+broadcast/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Claude Code
+.claude/
+
+# OS
+.DS_Store
+
+# Build
+dist/
+.next/
+
+# Logs
+*.log
+agent_log.json

@@ -1,0 +1,20 @@
+[profile.default]
+src = "packages/contracts/src"
+test = "packages/contracts/test"
+script = "packages/contracts/script"
+out = "out"
+libs = ["lib"]
+solc = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+evm_version = "paris"
+gas_reports = ["AgentLedgerEscrow", "MarketplaceHook"]
+
+[rpc_endpoints]
+celo = "https://forno.celo.org"
+celo_sepolia = "https://forno.celo-sepolia.celo-testnet.org"
+status_testnet = "https://public.sepolia.rpc.status.network"
+
+[etherscan]
+celo = { key = "${CELOSCAN_API_KEY}", url = "https://api.celoscan.io/api" }
+celo_sepolia = { key = "${CELOSCAN_API_KEY}", url = "https://celo-sepolia.blockscout.com/api" }
