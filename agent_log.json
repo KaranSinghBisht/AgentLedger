@@ -591,7 +591,7 @@
         "type": "guardrail",
         "description": "KEY_REVEALED",
         "output": {
-          "sealedKey": "4caf35c374ec0ada413b6c5f3af60268fc9650e1934c1497c5cece753b179f31",
+          "sealedKey": "[REDACTED — revealed only to client on approval]",
           "jobId": "22"
         },
         "timestamp": "2026-03-21T17:32:07.682Z",

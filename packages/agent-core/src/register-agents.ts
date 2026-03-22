@@ -10,7 +10,7 @@ const agents: Array<{
 }> = [
   {
     role: "orchestrator",
-    uri: "https://agentledger.xyz/agents/orchestrator",
+    uri: "https://agentledger.paracausal.tech/agents",
     meta: [
       { key: "role", value: "orchestrator" },
       { key: "capabilities", value: "job_creation,worker_selection,funding,verification" },
@@ -18,7 +18,7 @@ const agents: Array<{
   },
   {
     role: "worker",
-    uri: "https://agentledger.xyz/agents/worker",
+    uri: "https://agentledger.paracausal.tech/agents",
     meta: [
       { key: "role", value: "worker" },
       { key: "capabilities", value: "code_generation,research,data_analysis,writing" },
@@ -26,7 +26,7 @@ const agents: Array<{
   },
   {
     role: "sentinel",
-    uri: "https://agentledger.xyz/agents/sentinel",
+    uri: "https://agentledger.paracausal.tech/agents",
     meta: [
       { key: "role", value: "sentinel" },
       { key: "capabilities", value: "evaluation,quality_assurance,reputation_management" },

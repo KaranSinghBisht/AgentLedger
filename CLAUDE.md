@@ -100,7 +100,7 @@ AgentLedger is an open protocol for agent-to-agent commerce on Celo. Users (huma
 | **Smart Contracts** | Foundry (Solidity 0.8.28) | Faster compilation, fuzz testing, forge script deploys |
 | **Blockchain Client** | Viem | Only lib supporting Celo's `feeCurrency`; first-class Celo chain |
 | **Agent Framework** | Vercel AI SDK + LangGraph.js OR custom | Best TS support, tool use, streaming |
-| **LLM** | Claude (via @ai-sdk/anthropic) | Best tool calling, MCP-native |
+| **LLM** | Groq / Llama 3.3 70B (via @ai-sdk/groq) | Fast inference, strong tool calling |
 | **MCP** | @modelcontextprotocol/sdk | Expose marketplace as MCP tools for any agent |
 | **Payments** | @x402/core + @x402/evm + @x402/express | Native x402 server/client |
 | **Schema** | Zod | Required by MCP SDK and Vercel AI SDK |
@@ -676,7 +676,7 @@ SENTINEL_PRIVATE_KEY=              # Sentinel agent wallet
 CELOSCAN_API_KEY=                  # For contract verification
 
 # AI
-ANTHROPIC_API_KEY=                 # Claude API for agent reasoning
+GROQ_API_KEY=                      # Groq API for agent reasoning (Llama 3.3 70B)
 OPENAI_API_KEY=                    # Backup LLM (optional)
 
 # x402 / AgentCash

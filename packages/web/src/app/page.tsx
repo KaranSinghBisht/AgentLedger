@@ -17,7 +17,7 @@ export default async function LandingPage() {
   const jobCount = await fetchJobCount();
   const jobs = await fetchAllJobs();
   const completed = jobs.filter((j) => j.status === 3).length;
-  const totalEscrowed = jobs.reduce((sum, j) => sum + BigInt(j.budget), 0n);
+  const totalEscrowed = jobs.filter((j) => j.status === 1 || j.status === 2).reduce((sum, j) => sum + BigInt(j.budget), 0n);
   const escrowedUsd = (Number(totalEscrowed) / 1e6).toFixed(0);
 
   return (

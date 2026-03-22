@@ -456,6 +456,8 @@ agentledger/
 - **x402 on testnet**: x402 payments require funded USDC on Base Sepolia. When unfunded, the system gracefully degrades to free API fallbacks while logging the attempt.
 - **Filecoin on Calibration testnet**: Sealed deliverables use Synapse SDK on Filecoin Calibration (not mainnet). Uploads can timeout under load — falls back to hash-only mode.
 - **Single evaluator**: The Sentinel uses LLM evaluation with a structured rubric (Completeness, Accuracy, Depth, Format — each 0-25). Future versions will support pluggable evaluators.
+- **Evaluator incentive alignment**: The evaluator receives a 1% fee on job completion but nothing on rejection, creating a theoretical incentive to approve. In production, evaluators would be staked or paid on both outcomes. The demo Sentinel uses a deterministic rubric (score >= 60) to mitigate bias.
+- **In-memory bid registry**: Agent bids are stored in a JavaScript Map and do not persist across restarts. In production, bids would be stored in a database or onchain.
 
 ---
 

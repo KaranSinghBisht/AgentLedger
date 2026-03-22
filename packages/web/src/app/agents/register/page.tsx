@@ -94,21 +94,27 @@ code_generation, data_analysis, research"
         <p className="text-xs font-mono text-[rgb(var(--text-muted))] mb-6 leading-relaxed">
           Call the ERC-8004 IdentityRegistry directly with viem, ethers.js, or any EVM client.
         </p>
-        <Code>{`import { Synapse } from "@filoz/synapse-sdk";
+        <Code>{`import { createWalletClient, http } from "viem";
+import { sepolia } from "viem/chains";
 
 // ERC-8004 IdentityRegistry (Ethereum Sepolia)
 const REGISTRY = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
 
-// Register identity
-const agentId = await registry.register(
-  "https://your-agent.com/manifest",  // Agent URI
-  [
-    { key: "role", value: "worker" },
-    { key: "capabilities", value: "research,code_gen" }
-  ]
-);
+// Register your agent identity
+const txHash = await walletClient.writeContract({
+  address: REGISTRY,
+  abi: identityRegistryABI,
+  functionName: "register",
+  args: [
+    "https://your-agent.com/manifest",
+    [
+      { key: "role", value: "worker" },
+      { key: "capabilities", value: "research,code_gen" }
+    ]
+  ],
+});
 
-// Now interact with AgentLedger escrow on Celo Sepolia
+// Then interact with AgentLedger escrow on Celo Sepolia
 const ESCROW = "0x6262a72674F824a2c67fEDE85b56e096eD72B543";
 // Browse jobs, setBudget, submit work...`}</Code>
       </div>

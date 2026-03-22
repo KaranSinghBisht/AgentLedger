@@ -2,7 +2,7 @@
 
 ## No Env Vars Required
 
-### 1. Smart Contract Tests (46 tests)
+### 1. Smart Contract Tests (51 tests)
 ```bash
 forge test -vvv
 # Specific test:
@@ -85,7 +85,7 @@ cd packages/agent-core && pnpm e2e "Research top 5 DeFi protocols on Celo"
 ```
 Full 5-phase flow: orchestrator -> worker -> sentinel.
 Features tested: sealed deliverables, x402 research, reputation write, receipt chain.
-Needs `GOOGLE_GENERATIVE_AI_API_KEY` in addition to wallet keys.
+Needs `GROQ_API_KEY` in addition to wallet keys.
 Produces `agent_log.json` with hash-chained receipt entries.
 
 **Expected console output includes:**
@@ -110,9 +110,11 @@ pnpm sentinel
 ```bash
 cd packages/agent-core && pnpm mcp
 # Listens on stdin/stdout — connect via Claude Code or any MCP client
-# Exposes 14 tools: create_job, set_provider, set_budget, fund_job, submit_work,
+# Exposes 21 tools: create_job, set_provider, set_budget, fund_job, submit_work,
 # evaluate_work, browse_jobs, get_job, register_agent, get_reputation,
-# check_balance, resolve_name, store_deliverable, retrieve_deliverable
+# check_balance, resolve_name, store_deliverable, retrieve_deliverable,
+# claim_refund, submit_bid, get_bids, select_worker, give_feedback,
+# set_agent_name, agentcash_fetch
 ```
 
 ### 10. OpenServ Agents
@@ -136,7 +138,7 @@ cd packages/web && pnpm dev
 
 | Integration | Status | Notes |
 |-------------|--------|-------|
-| ERC-8183 Escrow | **Real** | Full lifecycle on Celo Sepolia, 46 contract tests |
+| ERC-8183 Escrow | **Real** | Full lifecycle on Celo Sepolia, 51 contract tests |
 | ERC-8004 Identity/Reputation | **Real** | Reads/writes to official Eth Sepolia registries |
 | x402 / AgentCash | **Real + fallback** | x402 payments with DuckDuckGo/direct fetch fallback |
 | Filecoin (Synapse SDK) | **Real + fallback** | Synapse upload/download; falls back to hash-only mode |
@@ -144,7 +146,7 @@ cd packages/web && pnpm dev
 | Receipt Chain | **Real + fallback** | keccak256 hash chain always computed; Filecoin upload best-effort |
 | ENS | **Real** | Resolves names via Eth mainnet; exposed via MCP, not used in E2E |
 | OpenServ | **Real** | 3-agent SDK integration; requires OPENSERV_API_KEY |
-| MCP Server | **Real** | 14 tools + 1 resource, all wired to onchain functions |
+| MCP Server | **Real** | 21 tools + 1 resource, all wired to onchain functions |
 | Status Network | **Deployed** | Gasless escrow at 0x9553d8b8af9588f5d553ec1bcd05f8d1bc8693db |
 | Frontend | **Real** | SSR reads from deployed contracts, no mock data |
 
@@ -152,7 +154,7 @@ cd packages/web && pnpm dev
 
 | Feature | Verified By |
 |---------|-------------|
-| Escrow lifecycle (ERC-8183) | forge test (40 tests) + pnpm demo |
+| Escrow lifecycle (ERC-8183) | forge test (51 tests) + pnpm demo |
 | Hook / reputation trigger | forge test (6 tests) |
 | Fuzz: settlement math | forge test (testFuzz_settlementMath) |
 | Sealed deliverables (AES-256-GCM) | Crypto roundtrip script (test 2) |
@@ -182,7 +184,7 @@ HOOK_CONTRACT_ADDRESS=0xF969c4Daa194d639E8d505EebF38600Cc1A87DaE
 PAYMENT_TOKEN_ADDRESS=0x9a68d2906AeAa8db01b3e8469653BA6E0d489a5c
 
 # For autonomous E2E (Phase 1-5 with LLM)
-GOOGLE_GENERATIVE_AI_API_KEY=...
+GROQ_API_KEY=...
 
 # Optional
 OPENSERV_API_KEY=...                 # For OpenServ multi-agent

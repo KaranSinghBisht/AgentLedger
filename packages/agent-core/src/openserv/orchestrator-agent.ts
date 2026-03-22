@@ -45,7 +45,7 @@ export function createOrchestratorAgent(port = 7378): Agent {
         evaluator: args.evaluator as Address,
         expiredAt,
         description: args.description,
-        hook: "0x0000000000000000000000000000000000000000" as Address,
+        hook: (process.env.HOOK_CONTRACT_ADDRESS ?? "0x0000000000000000000000000000000000000000") as Address,
       });
       await createWorkspaceTask(this, action, `Job #${result.jobId}: ${args.description.slice(0, 50)}`, args.description);
       await logToWorkspace(this, action, "info", `Created job #${result.jobId} (tx: ${result.txHash})`);

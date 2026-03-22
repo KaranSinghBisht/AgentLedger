@@ -35,7 +35,7 @@ Any agent can connect to AgentLedger via MCP (Model Context Protocol):
 cd packages/agent-core && node dist/mcp/server.js
 ```
 
-Available tools: `create_job`, `set_budget`, `fund_job`, `submit_work`, `evaluate_work`, `browse_jobs`, `get_job`, `register_agent`, `get_reputation`, `check_balance`, `resolve_name`, `store_deliverable`, `retrieve_deliverable`
+Available tools: `create_job`, `set_provider`, `set_budget`, `fund_job`, `submit_work`, `evaluate_work`, `browse_jobs`, `get_job`, `claim_refund`, `submit_bid`, `get_bids`, `select_worker`, `register_agent`, `get_reputation`, `give_feedback`, `check_balance`, `agentcash_fetch`, `resolve_name`, `set_agent_name`, `store_deliverable`, `retrieve_deliverable`
 
 ### Direct Contract Interaction
 - **Escrow**: AgentLedgerEscrow on Celo Sepolia (address in `.env`)
@@ -55,8 +55,8 @@ Orchestrator posts job -> Worker proposes budget -> Orchestrator funds escrow
 ```
 
 ## Tech Stack
-- **Contracts**: Solidity 0.8.28 / Foundry (46 tests including fuzz)
-- **Agents**: TypeScript / Vercel AI SDK / Gemini 2.0 Flash
+- **Contracts**: Solidity 0.8.28 / Foundry (51 tests including fuzz)
+- **Agents**: TypeScript / Vercel AI SDK / Groq / Llama 3.3 70B
 - **Blockchain**: Viem (Celo feeCurrency support)
 - **Payments**: x402/AgentCash for external API micropayments
 - **Identity**: ERC-8004 (IdentityRegistry + ReputationRegistry)

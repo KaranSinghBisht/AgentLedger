@@ -188,7 +188,7 @@ Your task:
 4. Select the BEST value candidate
 5. Call set_provider with jobId ${jobId} and the winning agent's address
 
-Consider: Worker A is cheaper (15 vs 25 USDC) and specializes in DeFi research.`,
+`,
     tools: {
       get_reputation: orchestratorTools.get_reputation,
       set_provider: orchestratorTools.set_provider,
