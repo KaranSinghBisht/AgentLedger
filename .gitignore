@@ -35,3 +35,4 @@ mcp-config.json
 # Deliverables cache
 packages/web/public/deliverables.json
 .vercel
+DEMO_SCRIPT.md
