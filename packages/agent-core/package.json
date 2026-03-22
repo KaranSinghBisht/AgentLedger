@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "test": "vitest run",
     "demo": "tsx src/run-demo.ts",
     "e2e": "tsx src/run-e2e-agents.ts",
     "orchestrator": "tsx src/run-orchestrator.ts",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/node": "^22.13.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.0"
   }
 }

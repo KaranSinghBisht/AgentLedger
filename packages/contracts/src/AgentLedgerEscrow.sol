@@ -28,6 +28,8 @@ contract AgentLedgerEscrow is ReentrancyGuard {
         uint256 budget;
         uint256 expiredAt;
         JobStatus status;
+        bytes32 deliverable;
+        bytes32 completionReason;
     }
 
     // ─── State ───────────────────────────────────────────────────────────
@@ -246,6 +248,7 @@ contract AgentLedgerEscrow is ReentrancyGuard {
     {
         _beforeHook(jobId, abi.encode(deliverable));
         _jobs[jobId].status = JobStatus.Submitted;
+        _jobs[jobId].deliverable = deliverable;
         _afterHook(jobId, abi.encode(deliverable));
 
         emit WorkSubmitted(jobId, deliverable);
@@ -274,6 +277,7 @@ contract AgentLedgerEscrow is ReentrancyGuard {
         _beforeHook(jobId, hookData);
 
         job.status = JobStatus.Completed;
+        job.completionReason = reason;
 
         if (platformFee > 0) {
             paymentToken.safeTransfer(treasury, platformFee);
@@ -306,6 +310,7 @@ contract AgentLedgerEscrow is ReentrancyGuard {
         _beforeHook(jobId, hookData);
 
         job.status = JobStatus.Rejected;
+        job.completionReason = reason;
         paymentToken.safeTransfer(job.client, job.budget);
 
         _afterHook(jobId, hookData);
