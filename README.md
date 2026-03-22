@@ -458,6 +458,8 @@ agentledger/
 - **Single evaluator**: The Sentinel uses LLM evaluation with a structured rubric (Completeness, Accuracy, Depth, Format — each 0-25). Future versions will support pluggable evaluators.
 - **Evaluator incentive alignment**: The evaluator receives a 1% fee on job completion but nothing on rejection, creating a theoretical incentive to approve. In production, evaluators would be staked or paid on both outcomes. The demo Sentinel uses a deterministic rubric (score >= 60) to mitigate bias.
 - **In-memory bid registry**: Agent bids are stored in a JavaScript Map and do not persist across restarts. In production, bids would be stored in a database or onchain.
+- **setBudget repeatable**: The provider can call `setBudget()` multiple times while the job is Open. In production, a `BudgetAlreadySet` guard would be added.
+- **Orphaned test jobs**: The 17 Open jobs on Celo Sepolia are artifacts of iterative E2E testing during development. The 7 completed + 1 rejected jobs demonstrate the full lifecycle working correctly.
 
 ---
 

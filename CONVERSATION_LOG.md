@@ -74,4 +74,6 @@ Final E2E dry run: Job #22, all 7 phases completed, real Filecoin CID returned, 
 
 ---
 
+*Note: Commits were batched at the end of each session rather than pushed incrementally during development. The git history reflects commit timing, not development timing.*
+
 *Built solo by Karan Singh Bisht with Claude Code (Anthropic) for The Synthesis, March 2026.*
