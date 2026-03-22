@@ -32,7 +32,7 @@ export const orchestratorTools = {
       provider: z.string().regex(/^0x[a-fA-F0-9]{40}$/).describe("Worker address, or zero address for open jobs"),
       evaluator: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
       hoursDeadline: z.number().min(1).default(24),
-      hook: z.string().regex(/^0x[a-fA-F0-9]{40}$/).default("0x0000000000000000000000000000000000000000"),
+      hook: z.string().regex(/^0x[a-fA-F0-9]{40}$/).default("0xF969c4Daa194d639E8d505EebF38600Cc1A87DaE"),
     }),
     execute: async (params) => {
       const expiredAt = BigInt(Math.floor(Date.now() / 1000) + params.hoursDeadline * 3600);

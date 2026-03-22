@@ -10,7 +10,7 @@ export const createJobSchema = z.object({
   evaluator: addressSchema.describe("Evaluator (sentinel) address"),
   expiredAt: z.number().describe("Unix timestamp for job deadline"),
   description: z.string().min(10).max(5000).describe("Job requirements"),
-  hook: addressSchema.default("0x0000000000000000000000000000000000000000").describe("Hook contract address"),
+  hook: addressSchema.default("0xF969c4Daa194d639E8d505EebF38600Cc1A87DaE").describe("Hook contract address"),
 });
 
 export const setProviderSchema = z.object({

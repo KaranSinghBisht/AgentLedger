@@ -15,7 +15,6 @@
     "openserv": "tsx src/openserv/run.ts"
   },
   "dependencies": {
-    "@ai-sdk/google": "^0.0.52",
     "@ai-sdk/groq": "^1.2.9",
     "@filoz/synapse-sdk": "^0.40.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
