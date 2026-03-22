@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@agentledger/agent-core": "workspace:*",
     "@rainbow-me/rainbowkit": "^2.2.10",
     "@tanstack/react-query": "^5.91.3",
     "next": "^15.3.4",
