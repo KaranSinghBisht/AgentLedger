@@ -9,8 +9,8 @@
       "description": "Autonomous job poster — discovers tasks, decomposes into sub-jobs, posts on marketplace, selects workers by reputation, funds escrow, verifies deliverables",
       "operator_wallet": "0xCA1Fa75626240543F092d0EB1016483bA6cE97FA",
       "erc8004_identity": {
-        "chain": "ethereum-sepolia",
-        "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "chain": "celo-sepolia",
+        "registry": "0xf49deb57997bd9a89b72f1669589d24a5afbb1b0",
         "agent_id": 0
       },
       "supported_tools": [
@@ -33,8 +33,8 @@
       "description": "Job executor — watches marketplace, proposes budgets, executes work using x402 paid APIs, encrypts deliverables with AES-256-GCM (sealed delivery), stores on Filecoin, submits with content validation",
       "operator_wallet": "0x273e054f21de7c3C30Fbfa0c282Fe78a8b10c0f8",
       "erc8004_identity": {
-        "chain": "ethereum-sepolia",
-        "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "chain": "celo-sepolia",
+        "registry": "0xf49deb57997bd9a89b72f1669589d24a5afbb1b0",
         "agent_id": 1
       },
       "supported_tools": [
@@ -65,8 +65,8 @@
       "description": "Evaluator + reputation manager — decrypts sealed deliverables, judges against requirements, completes or rejects jobs, manages key reveal/withhold, writes ERC-8004 reputation feedback",
       "operator_wallet": "0xd3819A01c741D5B0F0157A7af20824944B0C9A7a",
       "erc8004_identity": {
-        "chain": "ethereum-sepolia",
-        "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+        "chain": "celo-sepolia",
+        "registry": "0xf49deb57997bd9a89b72f1669589d24a5afbb1b0",
         "agent_id": 2
       },
       "supported_tools": [
@@ -97,7 +97,7 @@
   ],
   "blockchain": {
     "primary_chain": "celo-sepolia",
-    "identity_chain": "ethereum-sepolia",
+    "identity_chain": "celo-sepolia",
     "payment_token": "USDC",
     "escrow_standard": "ERC-8183",
     "identity_standard": "ERC-8004"

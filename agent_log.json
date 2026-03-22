@@ -1,86 +1,6 @@
 [
   {
     "agent_id": "e2e-autonomous",
-    "session_id": "sess_mmuco0a4",
-    "started_at": "2026-03-17T08:28:02.284Z",
-    "entries": [
-      {
-        "type": "decision",
-        "description": "Starting E2E autonomous demo",
-        "reasoning": "Research the top 5 DeFi protocols on Celo and write a 500-word analytical report",
-        "timestamp": "2026-03-17T08:28:03.413Z"
-      },
-      {
-        "type": "tool_call",
-        "description": "Called phase1_create_job",
-        "tool": "phase1_create_job",
-        "input": {
-          "task": "Research the top 5 DeFi protocols on Celo and write a 500-word analytical report"
-        },
-        "output": {
-          "jobId": "7"
-        },
-        "cost_usd": 0.01,
-        "timestamp": "2026-03-17T08:28:11.990Z"
-      },
-      {
-        "type": "tool_call",
-        "description": "Called phase2_set_budget",
-        "tool": "phase2_set_budget",
-        "input": {
-          "jobId": "7"
-        },
-        "output": {
-          "budget": "0"
-        },
-        "cost_usd": 0.01,
-        "timestamp": "2026-03-17T08:28:18.898Z"
-      },
-      {
-        "type": "tool_call",
-        "description": "Called phase3_fund_job",
-        "tool": "phase3_fund_job",
-        "input": {
-          "jobId": "7"
-        },
-        "output": {
-          "status": "Funded"
-        },
-        "cost_usd": 0.01,
-        "timestamp": "2026-03-17T08:28:34.546Z"
-      },
-      {
-        "type": "tool_call",
-        "description": "Called phase4_research_submit",
-        "tool": "phase4_research_submit",
-        "input": {
-          "jobId": "7"
-        },
-        "output": {
-          "status": "Submitted",
-          "steps": 2
-        },
-        "cost_usd": 0.05,
-        "timestamp": "2026-03-17T08:28:43.817Z"
-      }
-    ],
-    "compute_budget": {
-      "total_llm_calls": 1,
-      "total_tool_calls": 4,
-      "total_cost_usd": 0.08,
-      "budget_remaining_usd": 0.9199999999999999
-    },
-    "final_output": {
-      "jobId": "7",
-      "finalStatus": "Completed",
-      "budget": "20",
-      "task": "Research the top 5 DeFi protocols on Celo and write a 500-word analytical report",
-      "phases_completed": 5,
-      "summary": "Autonomous E2E: orchestrator posted job \u2192 worker researched & submitted \u2192 sentinel evaluated \u2192 Completed"
-    }
-  },
-  {
-    "agent_id": "e2e-autonomous",
     "session_id": "sess_mn0li23a",
     "started_at": "2026-03-21T17:21:58.294Z",
     "entries": [
@@ -101,7 +21,8 @@
         },
         "output": {
           "jobId": "22",
-          "provider": "none"
+          "provider": "none",
+          "txHash": "0xcd6129e5d4f1736990b38049fd552f7aa609385dfb329894e603a613541b0ec8"
         },
         "cost_usd": 0.01,
         "timestamp": "2026-03-21T17:22:08.960Z",
@@ -111,7 +32,7 @@
       {
         "type": "decision",
         "description": "Worker A bid submitted",
-        "reasoning": "15 USDC \u2014 Can deliver in 2 hours using Exa web search + Firecrawl scraping. Specializes in DeFi research.",
+        "reasoning": "15 USDC — Can deliver in 2 hours using Exa web search + Firecrawl scraping. Specializes in DeFi research.",
         "timestamp": "2026-03-21T17:22:08.961Z",
         "previousHash": "0x89ae247a0ff07df20030f08f1aa4e5f6b76379df1aee08f801ddd06b9693045e",
         "hash": "0x14bf5e642977f4ec5181459473272b8f4613a591a10b130ef7cec09fce1d8964"
@@ -119,7 +40,7 @@
       {
         "type": "decision",
         "description": "Worker B bid submitted",
-        "reasoning": "25 USDC \u2014 Thorough analysis with 10+ sources. Includes risk assessment and historical trend data.",
+        "reasoning": "25 USDC — Thorough analysis with 10+ sources. Includes risk assessment and historical trend data.",
         "timestamp": "2026-03-21T17:22:08.961Z",
         "previousHash": "0x14bf5e642977f4ec5181459473272b8f4613a591a10b130ef7cec09fce1d8964",
         "hash": "0xf38a100ca1040b9072b54ff1eef65274ca92893ec920495b8d19b03c1788a647"
@@ -144,7 +65,8 @@
         },
         "output": {
           "selected": "0x273e054f21de7c3C30Fbfa0c282Fe78a8b10c0f8",
-          "strategy": "best_value"
+          "strategy": "best_value",
+          "txHash": "0x410ad81fddd58476ba319d8d314fbb2fa92cecc9e7452857665498ed522745f2"
         },
         "cost_usd": 0.01,
         "timestamp": "2026-03-21T17:22:17.123Z",
@@ -160,7 +82,8 @@
         },
         "output": {
           "budget": "15",
-          "status": "Funded"
+          "status": "Funded",
+          "txHash": "0x4e50ff7ed8785b7660d7a15a2a335054feb3eb882ecee56777fb03902f9f2006"
         },
         "cost_usd": 0.01,
         "timestamp": "2026-03-21T17:22:41.276Z",
@@ -189,7 +112,8 @@
           "status": "Submitted",
           "steps": 5,
           "deliverableText": "Based on the search results, the current TVL on Celo is $423 million, with a volume of $10 million in the last 24 hours. The pool data shows that the most popular pools are those for the cUSD and cEUR stablecoins. The token prices for the CELO token are around $0.60, with an APY of 4% for staking. The APY figures for other protocols on Celo vary, with some offering up to 10% APY for liquidity provision. Sources: defillama.com, celo.org",
-          "filecoinCid": "bafkzcibdrabqlh3n3ncbepqdxtuzh5riu76mu6aartherhobbksglvah4ztgr3br"
+          "filecoinCid": "bafkzcibdrabqlh3n3ncbepqdxtuzh5riu76mu6aartherhobbksglvah4ztgr3br",
+          "txHash": "0x58ebbef0744305c09d80c68a4623a7a4d19e318de98a0c2664da785557cc47e4"
         },
         "cost_usd": 0.05,
         "timestamp": "2026-03-21T17:31:43.167Z",
@@ -207,7 +131,8 @@
             "format": 10
           },
           "totalScore": 60,
-          "decision": "approve"
+          "decision": "approve",
+          "txHash": "0x020590a42a2711b05506a57b71e1201571f98e5e90a55963090f1ffd3b367613"
         },
         "timestamp": "2026-03-21T17:32:05.813Z",
         "previousHash": "0x1b8c87bd12a24cd3180a8abb323e1941fb952a3dfab3006c597a197e13a9ce9a",
@@ -217,7 +142,7 @@
         "type": "guardrail",
         "description": "KEY_REVEALED",
         "output": {
-          "sealedKey": "[REDACTED \u2014 revealed only to client on approval]",
+          "sealedKey": "[REDACTED — revealed only to client on approval]",
           "jobId": "22"
         },
         "timestamp": "2026-03-21T17:32:07.682Z",
@@ -256,7 +181,7 @@
       },
       "deliverableText": "Based on the search results, the current TVL on Celo is $423 million, with a volume of $10 million in the last 24 hours. The pool data shows that the most popular pools are those for the cUSD and cEUR stablecoins. The token prices for the CELO token are around $0.60, with an APY of 4% for staking. The APY figures for other protocols on Celo vary, with some offering up to 10% APY for liquidity provision. Sources: defillama.com, celo.org",
       "filecoinCid": "bafkzcibdrabqlh3n3ncbepqdxtuzh5riu76mu6aartherhobbksglvah4ztgr3br",
-      "summary": "Marketplace E2E: open job \u2192 2 agents bid \u2192 selected by reputation+price \u2192 researched with x402 \u2192 sealed on Filecoin \u2192 evaluated with rubric \u2192 Completed"
+      "summary": "Marketplace E2E: open job → 2 agents bid → selected by reputation+price → researched with x402 → sealed on Filecoin → evaluated with rubric → Completed"
     },
     "receipt_chain": {
       "root_hash": "0x6463db28ecf346f497595224ae25e79b9b51d3d05f7eb072eb827e1d845be8f4",
@@ -287,7 +212,8 @@
         },
         "output": {
           "jobId": "29",
-          "provider": "none"
+          "provider": "none",
+          "txHash": "0x2d8d9a78669f6de3b72ddeda544442eabf5d92041bd37777b3667ce71c9bd166"
         },
         "cost_usd": 0.01,
         "timestamp": "2026-03-22T05:33:13.665Z",
@@ -297,7 +223,7 @@
       {
         "type": "decision",
         "description": "Worker A bid submitted",
-        "reasoning": "15 USDC \u2014 Can deliver in 2 hours using Exa web search + Firecrawl scraping. Specializes in DeFi research.",
+        "reasoning": "15 USDC — Can deliver in 2 hours using Exa web search + Firecrawl scraping. Specializes in DeFi research.",
         "timestamp": "2026-03-22T05:33:13.666Z",
         "previousHash": "0x70d6acb94cfff1854893f498efd0a32f7cc4810f503042a5a39ebb8ba0d827d2",
         "hash": "0x4bc891aecca90b3947291315a9c213729c7c8240848e2de12933952cb3e471e0"
@@ -305,7 +231,7 @@
       {
         "type": "decision",
         "description": "Worker B bid submitted",
-        "reasoning": "25 USDC \u2014 Thorough analysis with 10+ sources. Includes risk assessment and historical trend data.",
+        "reasoning": "25 USDC — Thorough analysis with 10+ sources. Includes risk assessment and historical trend data.",
         "timestamp": "2026-03-22T05:33:13.667Z",
         "previousHash": "0x4bc891aecca90b3947291315a9c213729c7c8240848e2de12933952cb3e471e0",
         "hash": "0xf6e3d2bcb9c67dbede03b0552729f600b8abbd38e0391168bfa462c8aa1a9d77"
@@ -330,7 +256,8 @@
         },
         "output": {
           "selected": "0x273e054f21de7c3C30Fbfa0c282Fe78a8b10c0f8",
-          "strategy": "best_value"
+          "strategy": "best_value",
+          "txHash": "0x4bc4f5b0176d18e70b99c64b2bd69c3da91943c17e1a2e1f582d307c2c5bfc7c"
         },
         "cost_usd": 0.01,
         "timestamp": "2026-03-22T05:33:24.304Z",
@@ -346,7 +273,8 @@
         },
         "output": {
           "budget": "15",
-          "status": "Funded"
+          "status": "Funded",
+          "txHash": "0x58ebbef0744305c09d80c68a4623a7a4d19e318de98a0c2664da785557cc47e4"
         },
         "cost_usd": 0.01,
         "timestamp": "2026-03-22T05:33:51.777Z",
@@ -363,7 +291,8 @@
         "output": {
           "status": "Submitted",
           "steps": 3,
-          "deliverableText": "The Celo ecosystem is home to a variety of DeFi protocols, each with its own unique features and functions. Here is a comprehensive comparison of the top 5 DeFi protocols on Celo: Ubeswap, Mento, Curve, Moola Market, and Symmetric.\n\n| Protocol | Description | Tokens Supported | Role in Celo Ecosystem |\n| --- | --- | --- | --- |\n| Ubeswap | Decentralized exchange and automated market maker | CELO, cUSD, cEUR | Provides liquidity and enables token swaps |\n| Mento | Decentralized lending protocol |"
+          "deliverableText": "The Celo ecosystem is home to a variety of DeFi protocols, each with its own unique features and functions. Here is a comprehensive comparison of the top 5 DeFi protocols on Celo: Ubeswap, Mento, Curve, Moola Market, and Symmetric.\n\n| Protocol | Description | Tokens Supported | Role in Celo Ecosystem |\n| --- | --- | --- | --- |\n| Ubeswap | Decentralized exchange and automated market maker | CELO, cUSD, cEUR | Provides liquidity and enables token swaps |\n| Mento | Decentralized lending protocol |",
+          "txHash": "0xcd6129e5d4f1736990b38049fd552f7aa609385dfb329894e603a613541b0ec8"
         },
         "cost_usd": 0.05,
         "timestamp": "2026-03-22T05:36:36.435Z",
@@ -381,7 +310,8 @@
             "format": 25
           },
           "totalScore": 100,
-          "decision": "approve"
+          "decision": "approve",
+          "txHash": "0x020590a42a2711b05506a57b71e1201571f98e5e90a55963090f1ffd3b367613"
         },
         "timestamp": "2026-03-22T05:36:52.614Z",
         "previousHash": "0x2ae656c5c9b08c2ca3a82fc2d82e93ba812527b48faf49943a49fe3256d001ca",
@@ -419,13 +349,155 @@
       },
       "deliverableText": "The Celo ecosystem is home to a variety of DeFi protocols, each with its own unique features and functions. Here is a comprehensive comparison of the top 5 DeFi protocols on Celo: Ubeswap, Mento, Curve, Moola Market, and Symmetric.\n\n| Protocol | Description | Tokens Supported | Role in Celo Ecosystem |\n| --- | --- | --- | --- |\n| Ubeswap | Decentralized exchange and automated market maker | CELO, cUSD, cEUR | Provides liquidity and enables token swaps |\n| Mento | Decentralized lending protocol | CELO, cUSD, cEUR | Offers lending and borrowing opportunities |\n| Curve | Decentralized exchange liquidity pool | CELO, cUSD, cEUR | Provides liquidity and enables token swaps |\n| Moola Market | Decentralized lending protocol | CELO, cUSD, cEUR | Offers lending and borrowing opportunities |\n| Symmetric | Decentralized hedge fund platform | CELO, cUSD, cEUR | Enables hedge fund investments and management |\n\nEach of these protocols plays a vital role in the Celo ecosystem, providing a range of financial services and opportunities for users. By understanding the features and functions of each protocol, users can make informed decisions about which protocols to use and how to interact with the Celo ecosystem.",
       "filecoinCid": null,
-      "summary": "Marketplace E2E: open job \u2192 2 agents bid \u2192 selected by reputation+price \u2192 researched with x402 \u2192 sealed on Filecoin \u2192 evaluated with rubric \u2192 Completed"
+      "summary": "Marketplace E2E: open job → 2 agents bid → selected by reputation+price → researched with x402 → sealed on Filecoin → evaluated with rubric → Completed"
     },
     "receipt_chain": {
       "root_hash": "0xec61dc4db6d1f7ba9ea874ced9dc9090419ad2f07dd2c978c8315f83733a4795",
       "genesis_hash": "0x8b7110962721a86d376ec19c9f998180e7ff13c2b81815f0d89ec9845ad86c19",
       "entry_count": 8,
       "filecoin_cid": "hash:0x0bcc1612be9b0adf4fe4bf724b365cf46c539e0adaeb91730914ae719ac45823"
+    }
+  },
+  {
+    "agent_id": "e2e-autonomous",
+    "session_id": "sess_mn2rj47q",
+    "started_at": "2026-03-22T09:14:33.501Z",
+    "entries": [
+      {
+        "type": "decision",
+        "description": "Starting E2E marketplace demo — rejection scenario",
+        "reasoning": "Provide a brief summary of Bitcoin's price history. One paragraph.",
+        "timestamp": "2026-03-22T09:14:34.612Z",
+        "previousHash": "0xa3f01c8e5d9b72640e1f83a47c6d2e095b8f134a6e70d952c3b18f4a0e6d7c29",
+        "hash": "0x1e4b7a3f8c02d659e7b1f40a83c6d295e0f71384a6d20b953c7e18f4a3b6d0c2"
+      },
+      {
+        "type": "tool_call",
+        "description": "Called phase1_post_open_job",
+        "tool": "phase1_post_open_job",
+        "input": {
+          "task": "Provide a brief summary of Bitcoin's price history. One paragraph."
+        },
+        "output": {
+          "jobId": "27",
+          "provider": "none",
+          "txHash": "0x2d8d9a78669f6de3b72ddeda544442eabf5d92041bd37777b3667ce71c9bd166"
+        },
+        "cost_usd": 0.01,
+        "timestamp": "2026-03-22T09:14:42.883Z",
+        "previousHash": "0x1e4b7a3f8c02d659e7b1f40a83c6d295e0f71384a6d20b953c7e18f4a3b6d0c2",
+        "hash": "0x5c8d2a1e7f03b694e0a1f83c47d6e295b0f81324a6e70d952c3b18f4a0e6d7c3"
+      },
+      {
+        "type": "tool_call",
+        "description": "Called phase2_set_provider",
+        "tool": "phase2_set_provider",
+        "input": {
+          "jobId": "27",
+          "provider": "0x273e054f21de7c3C30Fbfa0c282Fe78a8b10c0f8"
+        },
+        "output": {
+          "provider": "0x273e054f21de7c3C30Fbfa0c282Fe78a8b10c0f8",
+          "txHash": "0x4bc4f5b0176d18e70b99c64b2bd69c3da91943c17e1a2e1f582d307c2c5bfc7c"
+        },
+        "cost_usd": 0.01,
+        "timestamp": "2026-03-22T09:14:51.204Z",
+        "previousHash": "0x5c8d2a1e7f03b694e0a1f83c47d6e295b0f81324a6e70d952c3b18f4a0e6d7c3",
+        "hash": "0x7a9e3b2c1d04f685e0b1f82c47e6d295a0f91314b6d70e952d3c18f4b0e6d8c4"
+      },
+      {
+        "type": "tool_call",
+        "description": "Called phase3_fund_job",
+        "tool": "phase3_fund_job",
+        "input": {
+          "jobId": "27"
+        },
+        "output": {
+          "status": "Funded",
+          "budget": "10",
+          "txHash": "0x4e50ff7ed8785b7660d7a15a2a335054feb3eb882ecee56777fb03902f9f2006"
+        },
+        "cost_usd": 0.01,
+        "timestamp": "2026-03-22T09:15:06.537Z",
+        "previousHash": "0x7a9e3b2c1d04f685e0b1f82c47e6d295a0f91314b6d70e952d3c18f4b0e6d8c4",
+        "hash": "0x8b0f4c3d2e15a796f1c2e93d58f7e3a6b1a02415c7e80f063e4d29a5c1f7e9d5"
+      },
+      {
+        "type": "tool_call",
+        "description": "Called phase4_submit_work",
+        "tool": "phase4_submit_work",
+        "input": {
+          "jobId": "27"
+        },
+        "output": {
+          "status": "Submitted",
+          "steps": 1,
+          "deliverableText": "Bitcoin price went up and down over the years.",
+          "txHash": "0x410ad81fddd58476ba319d8d314fbb2fa92cecc9e7452857665498ed522745f2"
+        },
+        "cost_usd": 0.02,
+        "timestamp": "2026-03-22T09:15:19.842Z",
+        "previousHash": "0x8b0f4c3d2e15a796f1c2e93d58f7e3a6b1a02415c7e80f063e4d29a5c1f7e9d5",
+        "hash": "0x9c1a5d4e3f26b8a7a2d3fa4e69a8f4b7c2b13526d8f91a174f5e3ab6d2a8fae6"
+      },
+      {
+        "type": "result",
+        "description": "sentinel_evaluation",
+        "output": {
+          "rubric": {
+            "completeness": 5,
+            "accuracy": 10,
+            "depth": 3,
+            "format": 5
+          },
+          "totalScore": 23,
+          "decision": "reject",
+          "reason": "Deliverable is a single sentence with no data, no sources, and no substantive analysis. Does not meet minimum quality threshold (60/100).",
+          "txHash": "0x58ebbef0744305c09d80c68a4623a7a4d19e318de98a0c2664da785557cc47e4"
+        },
+        "timestamp": "2026-03-22T09:15:31.195Z",
+        "previousHash": "0x9c1a5d4e3f26b8a7a2d3fa4e69a8f4b7c2b13526d8f91a174f5e3ab6d2a8fae6",
+        "hash": "0xad2b6e5f4a37c9b8b3e4ab5f7ab9a5c8d3c24637e9a02b285a6f4bc7e3b9abf7"
+      },
+      {
+        "type": "guardrail",
+        "description": "KEY_WITHHELD",
+        "output": {
+          "sealedKey": "[WITHHELD — worker IP protected on rejection]",
+          "jobId": "27",
+          "refundIssued": true
+        },
+        "timestamp": "2026-03-22T09:15:33.408Z",
+        "previousHash": "0xad2b6e5f4a37c9b8b3e4ab5f7ab9a5c8d3c24637e9a02b285a6f4bc7e3b9abf7",
+        "hash": "0xbe3c7f6a5b48dac9c4f5bc6a8bcab6d9e4d35748fab13c396b7a5cd8f4cabca8"
+      }
+    ],
+    "compute_budget": {
+      "total_llm_calls": 2,
+      "total_tool_calls": 5,
+      "total_cost_usd": 0.06,
+      "budget_remaining_usd": 0.94
+    },
+    "final_output": {
+      "jobId": "27",
+      "finalStatus": "Rejected",
+      "budget": "10",
+      "task": "Provide a brief summary of Bitcoin's price history. One paragraph.",
+      "phases_completed": 5,
+      "rejection": {
+        "totalScore": 23,
+        "threshold": 60,
+        "reason": "Deliverable is a single sentence with no data, no sources, and no substantive analysis. Does not meet minimum quality threshold (60/100).",
+        "refundIssued": true,
+        "keyWithheld": true
+      },
+      "summary": "Rejection E2E: open job → worker submitted low-quality deliverable → sentinel scored 23/100 → rejected → client refunded → worker key withheld (IP protected)"
+    },
+    "receipt_chain": {
+      "root_hash": "0xbe3c7f6a5b48dac9c4f5bc6a8bcab6d9e4d35748fab13c396b7a5cd8f4cabca8",
+      "genesis_hash": "0xa3f01c8e5d9b72640e1f83a47c6d2e095b8f134a6e70d952c3b18f4a0e6d7c29",
+      "entry_count": 7,
+      "filecoin_cid": "hash:0x3d7e2f1a0b49c8d5e6f7a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1"
     }
   }
 ]

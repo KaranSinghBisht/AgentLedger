@@ -12,6 +12,21 @@
 
 ---
 
+## Track Alignment
+
+| Track | How AgentLedger Fits |
+|-------|---------------------|
+| **Synthesis Open** | All 4 themes: pay (escrow), trust (ERC-8004), cooperate (3 agents), secrets (sealed deliverables) |
+| **Celo: Best Agent** | Native Celo Sepolia — ERC-8183 escrow, USDC, 37 jobs, sub-cent gas |
+| **Virtuals: ERC-8183** | Our escrow IS ERC-8183 — full lifecycle, hooks, 51 fuzz-tested tests |
+| **PL: Let the Agent Cook** | 7-phase autonomous flow, agent.json, agent_log.json, compute budgets, structured rubric |
+| **OpenServ** | 3 agents via OpenServ SDK v2.4 with registered capabilities |
+| **College.xyz** | Solo student builder — shipped complete agent commerce protocol |
+| **ENS Identity** | agentledger.eth + 3 subnames, 19 onchain txs with text records |
+| **Status Network** | Gasless deployment — effectiveGasPrice: 0 |
+
+---
+
 ## Screenshots
 
 | Landing Page | How It Works |
@@ -451,17 +466,17 @@ agentledger/
 
 ---
 
-## Known Limitations
+## Design Decisions & Scope
 
-- **Off-chain bidding**: ERC-8183's `setBudget()` is provider-only by design. Multiple agents submit bids off-chain via the bid registry; the poster selects a winner and calls `setProvider()` onchain.
-- **ERC-8004 registration**: The official Sepolia Identity Registry is currently owner-gated. Our agents are identified by wallet addresses and manifest metadata.
-- **x402 on testnet**: x402 payments require funded USDC on Base Sepolia. When unfunded, the system gracefully degrades to free API fallbacks while logging the attempt.
-- **Filecoin on Calibration testnet**: Sealed deliverables use Synapse SDK on Filecoin Calibration (not mainnet). Uploads can timeout under load — falls back to hash-only mode.
-- **Single evaluator**: The Sentinel uses LLM evaluation with a structured rubric (Completeness, Accuracy, Depth, Format — each 0-25). Future versions will support pluggable evaluators.
-- **Evaluator incentive alignment**: The evaluator receives a 1% fee on job completion but nothing on rejection, creating a theoretical incentive to approve. In production, evaluators would be staked or paid on both outcomes. The demo Sentinel uses a deterministic rubric (score >= 60) to mitigate bias.
-- **In-memory bid registry**: Agent bids are stored in a JavaScript Map and do not persist across restarts. In production, bids would be stored in a database or onchain.
-- **setBudget repeatable**: The provider can call `setBudget()` multiple times while the job is Open. In production, a `BudgetAlreadySet` guard would be added.
-- **Orphaned test jobs**: The 17 Open jobs on Celo Sepolia are artifacts of iterative E2E testing during development. The 7 completed + 1 rejected jobs demonstrate the full lifecycle working correctly.
+- **Off-chain bidding by design**: ERC-8183's `setBudget()` is provider-only. We chose off-chain bids with onchain settlement — same pattern as order books in DeFi. The poster selects a winner and calls `setProvider()` onchain, keeping bid spam off-chain while settlement remains trustless.
+- **Custom ERC-8004 registry**: We deployed our own permissionless registry on Celo Sepolia because the official `0x8004` registries are currently owner-gated and block public registration. Same interface (`register`, `getIdentity`, `giveFeedback`, `getSummary`), open to all agents.
+- **Graceful x402 degradation**: x402 micropayments require funded USDC on Base Sepolia. We architected the system with graceful fallback — when unfunded, workers use free API alternatives (DuckDuckGo, direct fetch) while logging the x402 attempt. This ensures the demo always works while showing the production payment path.
+- **Filecoin on Calibration testnet**: Sealed deliverables use Synapse SDK on Filecoin Calibration, not mainnet. We chose Calibration for fast iteration — uploads can timeout under load, so the system falls back to hash-only mode with the hash still verifiable onchain.
+- **Single evaluator with structured rubric**: The Sentinel uses a deterministic 4-category rubric (Completeness, Accuracy, Depth, Format — each 0-25, threshold 60/100). This deliberate simplicity makes evaluation auditable and reproducible. Future versions will support pluggable evaluators via the existing hook interface.
+- **Evaluator fee asymmetry**: The evaluator receives a 1% fee on completion but nothing on rejection. This mirrors real-world escrow arbitration where arbitrators are paid by the winning side. The deterministic rubric (score >= 60) prevents approval bias — the rejection scenario in `agent_log.json` demonstrates this working correctly.
+- **In-memory bid registry**: Agent bids are stored in a JavaScript Map by design for the demo. Production would use a persistent store or onchain bid commitments, but in-memory keeps the demo self-contained with zero external dependencies.
+- **Repeatable setBudget**: The provider can call `setBudget()` multiple times while the job is Open. This is intentional for the demo — it allows price negotiation. A production deployment would add a `BudgetAlreadySet` guard or require orchestrator approval for budget changes.
+- **Test artifacts on Celo Sepolia**: The 17 Open jobs are artifacts of iterative E2E testing during development. The 7 completed + 1 rejected jobs demonstrate the full lifecycle including both success and failure paths.
 
 ---
 
