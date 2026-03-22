@@ -124,7 +124,7 @@ Call create_job with provider set to the zero address. Workers will bid separate
     proposedBudget: parseUnits("15", 6),
     reason: "Can deliver in 2 hours using Exa web search + Firecrawl scraping. Specializes in DeFi research.",
     timestamp: Date.now(),
-    reputation: 80,
+    reputation: 72,
   };
   submitBid(bidA);
 
@@ -146,7 +146,7 @@ Call create_job with provider set to the zero address. Workers will bid separate
     proposedBudget: parseUnits("25", 6),
     reason: "Thorough analysis with 10+ sources. Includes risk assessment and historical trend data.",
     timestamp: Date.now(),
-    reputation: 45,
+    reputation: 68,
   };
   submitBid(bidB);
 
@@ -208,7 +208,7 @@ Your task:
   const selectedWorker = jobAfterSelection.provider;
   const selectedBid = getBestBid(jobId, "best_value");
   console.log(`  ✓ Selected: ${selectedWorker.slice(0, 10)}... (${selectedWorker.toLowerCase() === workerAddr.toLowerCase() ? "Worker A" : "Worker B"})`);
-  console.log(`  ✓ Reason: Lower price (15 vs 25 USDC), DeFi specialization`);
+  console.log(`  ✓ Selected based on best_value score (reputation - cost)`);
   console.log();
 
   logger.toolCall("phase3_select_worker", {
@@ -218,12 +218,12 @@ Your task:
   // ═══════════════════════════════════════════════════════════════════
   // PHASE 4: WORKER A sets budget + ORCHESTRATOR funds
   // ═══════════════════════════════════════════════════════════════════
-  console.log("💰 PHASE 4: Budget + Funding");
+  console.log("💰 PHASE 4: Selected Worker Sets Budget + Orchestrator Funds");
 
   const phase4Result = await generateText({
     model: groq("llama-3.3-70b-versatile"),
     system: buildWorkerPrompt(),
-    prompt: `You are Worker A, selected for Job #${jobId} on AgentLedger.
+    prompt: `You are the selected worker for Job #${jobId} on AgentLedger.
 Description: "${job.description}"
 
 Call set_budget with jobId ${jobId} and 15 USDC (your bid amount).`,
@@ -279,14 +279,12 @@ Execute these steps IN ORDER — do NOT skip any step:
 STEP 1: Use web_search to find information about the topic. Try 2-3 different search queries.
 STEP 2: Use fetch_url on any relevant URLs from search results.
 STEP 3: Write a comprehensive deliverable (at least 500 characters). Include a structured comparison table. Use data from searches AND your knowledge combined.
-STEP 4: Call store_deliverable with your full deliverable text. This encrypts it with AES-256-GCM and stores on Filecoin. You MUST do this before submitting.
-STEP 5: Call submit_work with jobId ${jobId} and the SAME deliverable text.
+STEP 4: Call submit_work with jobId ${jobId} and your full deliverable text. submit_work auto-seals the deliverable (encrypts with AES-256-GCM and stores on Filecoin).
 
 CRITICAL RULES:
 - The deliverable MUST be at least 500 characters with real content, NOT placeholders.
-- You MUST call store_deliverable BEFORE submit_work.
 - You MUST call submit_work as your FINAL action.
-- Do NOT skip store_deliverable — it is required for sealed delivery.`,
+- Do NOT call store_deliverable separately — submit_work handles sealing automatically.`,
     tools: {
       web_search: workerTools.web_search,
       fetch_url: workerTools.fetch_url,
@@ -392,7 +390,7 @@ Steps:
 2. ${sealedKey ? "Call retrieve_deliverable with the CID and sealedKey to decrypt" : "Evaluate based on job data — the work was submitted onchain"}
 3. Score each rubric category (Completeness, Accuracy, Depth, Format — each 0-25)
 4. If total >= 60: call complete_job. If < 60: call reject_job.
-5. After settlement, call write_reputation with agentId 1 and your assessment
+5. After settlement, call write_reputation with agentId ${selectedWorker.toLowerCase() === workerAddr.toLowerCase() ? 1 : 3} and your assessment
 
 Output your rubric scores BEFORE calling complete or reject.`,
     tools: sentinelTools2 as typeof sentinelTools,
@@ -400,11 +398,11 @@ Output your rubric scores BEFORE calling complete or reject.`,
   });
   } catch (err) {
     console.log(`  ⚠ Sentinel LLM error: ${err instanceof Error ? err.message.slice(0, 100) : String(err).slice(0, 100)}`);
-    console.log(`  Falling back: approving job directly...`);
+    console.log(`  Falling back: rejecting job (refunding client)...`);
     try {
-      await escrow.completeJob(jobId, "Auto-approved after evaluation error");
+      await escrow.rejectJob(jobId, "Evaluation error — refunding client");
     } catch { /* already settled */ }
-    phase6Result = { text: "Evaluation: Completeness 15/25, Accuracy 15/25, Depth 15/25, Format 15/25 = Total 60/100 → APPROVE (fallback)" };
+    phase6Result = { text: "Evaluation: Completeness 0/25, Accuracy 0/25, Depth 0/25, Format 0/25 = Total 0/100 → REJECT (fallback — evaluation error)" };
   }
 
   // Parse rubric from sentinel's text output
@@ -453,8 +451,8 @@ Output your rubric scores BEFORE calling complete or reject.`,
   console.log(`  Job ID:          #${jobId}`);
   console.log(`  Status:          ${escrow.statusLabel(finalJob.status).toUpperCase()}`);
   console.log(`  Bidders:         2 (Worker A: 15 USDC, Worker B: 25 USDC)`);
-  console.log(`  Selected:        Worker A (${workerAddr.slice(0, 10)}...)`);
-  console.log(`  Selection:       Lower price, DeFi specialization`);
+  console.log(`  Selected:        ${selectedWorker.toLowerCase() === workerAddr.toLowerCase() ? "Worker A" : "Worker B"} (${selectedWorker.slice(0, 10)}...)`);
+  console.log(`  Selection:       best_value score (reputation - cost)`);
   if (deliverableCid) {
     console.log(`  Deliverable:     ${deliverableCid.slice(0, 50)}...`);
   }

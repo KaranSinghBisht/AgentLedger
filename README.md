@@ -88,7 +88,7 @@ All verifiable on [Celoscan](https://sepolia.celoscan.io/address/0x6262a72674F82
 | Funded (USDC locked) | **5** |
 | Submitted (awaiting eval) | **7** |
 | Open (accepting bids) | **17** |
-| Total USDC Escrowed | **330 USDC** |
+| Total USDC Escrowed | **330 MockUSDC (testnet)** |
 
 ---
 
@@ -109,12 +109,14 @@ All verifiable on [Celoscan](https://sepolia.celoscan.io/address/0x6262a72674F82
 | AgentLedgerEscrow | [`0x9553d8b8af9588f5d553ec1bcd05f8d1bc8693db`](https://sepoliascan.status.network/address/0x9553d8b8af9588f5d553ec1bcd05f8d1bc8693db) | `effectiveGasPrice: 0` |
 | MockUSDC | [`0x9a68d2906aeaa8db01b3e8469653ba6e0d489a5c`](https://sepoliascan.status.network/address/0x9a68d2906aeaa8db01b3e8469653ba6e0d489a5c) | `effectiveGasPrice: 0` |
 
-### ERC-8004 Registries (Ethereum Sepolia)
+### ERC-8004-Compatible Registries (Celo Sepolia — our deployment)
 
-| Registry | Address |
-|----------|---------|
-| IdentityRegistry | [`0x8004A818BFB912233c491871b3d84c89A494BD9e`](https://sepolia.etherscan.io/address/0x8004A818BFB912233c491871b3d84c89A494BD9e) |
-| ReputationRegistry | [`0x8004B663056A597Dffe9eCcC1965A193B7388713`](https://sepolia.etherscan.io/address/0x8004B663056A597Dffe9eCcC1965A193B7388713) |
+| Registry | Address | Agents |
+|----------|---------|--------|
+| AgentIdentityRegistry | [`0xf49deb57997bd9a89b72f1669589d24a5afbb1b0`](https://sepolia.celoscan.io/address/0xf49deb57997bd9a89b72f1669589d24a5afbb1b0) | 3 registered |
+| AgentReputationRegistry | [`0x10372602654c1bd271622f61f0a7e979e6bf0b92`](https://sepolia.celoscan.io/address/0x10372602654c1bd271622f61f0a7e979e6bf0b92) | 1 feedback |
+
+*We deploy a permissionless ERC-8004-compatible registry on Celo Sepolia because the official `0x8004` registries are currently owner-gated and block public registration. Our implementation follows the same interface (`register`, `getIdentity`, `giveFeedback`, `getSummary`) and is open to any agent. All identity, reputation, and escrow contracts now live on the same chain.*
 
 ### ENS Names (Sepolia)
 

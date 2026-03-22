@@ -1,11 +1,11 @@
 import type { Address, Hash } from "viem";
 import { decodeEventLog } from "viem";
 import {
-  getEthSepoliaPublicClient,
-  getEthSepoliaWalletClient,
+  getPublicClient,
+  getWalletClient,
 } from "../blockchain/clients.js";
 import { identityRegistryAbi, reputationRegistryAbi } from "../blockchain/abis.js";
-import { erc8004Sepolia } from "../blockchain/addresses.js";
+import { erc8004CeloSepolia } from "../blockchain/addresses.js";
 import { getNextNonce, resetNonce } from "../blockchain/nonce-manager.js";
 
 export interface AgentIdentity {
@@ -20,16 +20,16 @@ export interface ReputationSummary {
   averageValueDecimals: number;
 }
 
-const REGISTRY = erc8004Sepolia;
+const REGISTRY = erc8004CeloSepolia;
 
 export async function registerAgent(
   role: "orchestrator" | "worker" | "sentinel",
   agentURI: string,
   metadata: Array<{ key: string; value: string }>
 ): Promise<{ agentId: bigint; txHash: Hash }> {
-  const wallet = getEthSepoliaWalletClient(role);
-  const pub = getEthSepoliaPublicClient();
-  const nonce = await getNextNonce(wallet.account.address, pub);
+  const wallet = getWalletClient(role);
+  const pub = getPublicClient();
+  const nonce = await getNextNonce(wallet.account.address);
 
   let txHash: Hash;
   try {
@@ -81,7 +81,7 @@ export async function registerAgent(
 }
 
 export async function getIdentity(agentId: bigint): Promise<AgentIdentity> {
-  const pub = getEthSepoliaPublicClient();
+  const pub = getPublicClient();
 
   const result = await pub.readContract({
     address: REGISTRY.identityRegistry,
@@ -104,9 +104,9 @@ export async function giveFeedback(params: {
   feedbackURI: string;
   feedbackHash: `0x${string}`;
 }): Promise<Hash> {
-  const wallet = getEthSepoliaWalletClient("sentinel");
-  const pub = getEthSepoliaPublicClient();
-  const nonce = await getNextNonce(wallet.account.address, pub);
+  const wallet = getWalletClient("sentinel");
+  const pub = getPublicClient();
+  const nonce = await getNextNonce(wallet.account.address);
 
   try {
     const txHash = await wallet.writeContract({
@@ -136,7 +136,7 @@ export async function giveFeedback(params: {
 
 export async function getReputation(agentId: bigint): Promise<ReputationSummary> {
   try {
-    const pub = getEthSepoliaPublicClient();
+    const pub = getPublicClient();
 
     const clients = (await pub.readContract({
       address: REGISTRY.reputationRegistry,

@@ -22,8 +22,9 @@ const ESCROW_ADDRESS: Address = "0x6262a72674F824a2c67fEDE85b56e096eD72B543";
 // Block at which the escrow contract was deployed — avoids scanning from genesis
 const ESCROW_DEPLOY_BLOCK = 11_000_000n;
 
-const IDENTITY_REGISTRY: Address = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
-const REPUTATION_REGISTRY: Address = "0x8004B663056A597Dffe9eCcC1965A193B7388713";
+// ERC-8004-compatible registries on Celo Sepolia (our permissionless deployment)
+const IDENTITY_REGISTRY: Address = "0xf49deb57997bd9a89b72f1669589d24a5afbb1b0";
+const REPUTATION_REGISTRY: Address = "0x10372602654c1bd271622f61f0a7e979e6bf0b92";
 
 // ─── Clients ───────────────────────────────────────────────────────────────
 
@@ -335,7 +336,7 @@ export async function fetchAgentIdentity(
   agentId: number
 ): Promise<AgentIdentity | null> {
   try {
-    const [owner, agentURI, metadata] = await ethSepoliaClient.readContract({
+    const [owner, agentURI, metadata] = await celoClient.readContract({
       address: IDENTITY_REGISTRY,
       abi: identityRegistryAbi,
       functionName: "getIdentity",
@@ -361,7 +362,7 @@ export async function fetchAgentReputation(
   agentId: number
 ): Promise<ReputationSummary | null> {
   try {
-    const clients = await ethSepoliaClient.readContract({
+    const clients = await celoClient.readContract({
       address: REPUTATION_REGISTRY,
       abi: reputationRegistryAbi,
       functionName: "getClients",
@@ -369,7 +370,7 @@ export async function fetchAgentReputation(
     });
 
     const [totalFeedbacks, averageValue, averageValueDecimals] =
-      await ethSepoliaClient.readContract({
+      await celoClient.readContract({
         address: REPUTATION_REGISTRY,
         abi: reputationRegistryAbi,
         functionName: "getSummary",

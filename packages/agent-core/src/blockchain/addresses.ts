@@ -21,16 +21,10 @@ export const celoSepolia: ContractAddresses = {
   paymentToken: requireAddress("PAYMENT_TOKEN_ADDRESS", "paymentToken"),
 };
 
-// ERC-8004 on Ethereum Mainnet (official)
-export const erc8004Ethereum = {
-  identityRegistry: "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" as Address,
-  reputationRegistry: "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63" as Address,
-};
-
-// ERC-8004 on Sepolia (official)
-export const erc8004Sepolia = {
-  identityRegistry: "0x8004A818BFB912233c491871b3d84c89A494BD9e" as Address,
-  reputationRegistry: "0x8004B663056A597Dffe9eCcC1965A193B7388713" as Address,
+// ERC-8004-compatible registries on Celo Sepolia (our deployment — permissionless)
+export const erc8004CeloSepolia = {
+  identityRegistry: "0xf49deb57997bd9a89b72f1669589d24a5afbb1b0" as Address,
+  reputationRegistry: "0x10372602654c1bd271622f61f0a7e979e6bf0b92" as Address,
 };
 
 export function getAddresses(chainId: number): ContractAddresses {
