@@ -150,7 +150,7 @@ graph TB
     subgraph "Protocol Layer"
         ESC[ERC-8183 Escrow<br/>Celo Sepolia]
         HOOK[MarketplaceHook<br/>IACPHook]
-        REG[ERC-8004 Registry<br/>Eth Sepolia]
+        REG[ERC-8004 Registry<br/>Celo Sepolia]
     end
 
     subgraph "Storage & Payments"
@@ -442,7 +442,7 @@ agentledger/
 |---------|------------|-----------|--------------|-------------------|
 | Multi-agent bidding | Off-chain bids + onchain selection | Single assignment | ACP negotiation | N/A |
 | Escrow | ERC-8183 on Celo | Direct payment | Custom escrow | No escrow |
-| Reputation | ERC-8004 (Eth Sepolia) | Karma system | Internal scoring | No reputation |
+| Reputation | ERC-8004 (Celo Sepolia) | Karma system | Internal scoring | No reputation |
 | IP Protection | AES-256-GCM + Filecoin | None | None | None |
 | Chain | Celo (sub-cent gas) | Gnosis only | Base only | N/A |
 | Payment token | USDC | OLAS token | VIRTUAL token | N/A |
