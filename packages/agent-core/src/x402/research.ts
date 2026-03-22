@@ -8,7 +8,7 @@ export interface SearchResult {
 
 export interface WebSearchResponse {
   results: SearchResult[];
-  source: "x402" | "duckduckgo" | "error";
+  source: "x402" | "duckduckgo" | "fallback" | "error";
 }
 
 export interface FetchUrlResponse {
@@ -43,7 +43,7 @@ export async function webSearch(query: string): Promise<WebSearchResponse> {
   // Fallback: DuckDuckGo instant answers (free, no API key)
   try {
     const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`;
-    const resp = await globalThis.fetch(ddgUrl);
+    const resp = await globalThis.fetch(ddgUrl, { signal: AbortSignal.timeout(10000) });
     if (resp.ok) {
       const data = (await resp.json()) as Record<string, unknown>;
       const results: SearchResult[] = [];
@@ -74,7 +74,17 @@ export async function webSearch(query: string): Promise<WebSearchResponse> {
     // Fallback also failed
   }
 
-  return { results: [], source: "error" };
+  // Final fallback: return empty results — agent must retry with different queries
+  return {
+    results: [
+      {
+        title: "Search unavailable",
+        url: "",
+        snippet: "All search APIs failed. Retry with a different query, or use fetch_url on a specific known URL.",
+      },
+    ],
+    source: "fallback",
+  };
 }
 
 export async function fetchUrl(url: string): Promise<FetchUrlResponse> {

@@ -6,24 +6,26 @@ export async function completeJobAndWait(
   jobId: bigint,
   reason: string
 ): Promise<{ txHash: Hash; status: string }> {
-  const pub = getPublicClient();
   const txHash = await escrow.completeJob(jobId, reason);
-  const receipt = await pub.waitForTransactionReceipt({ hash: txHash });
-  return {
-    txHash,
-    status: receipt.status === "success" ? "confirmed" : "failed",
-  };
+  const pub = getPublicClient();
+  const receipt = await pub.getTransactionReceipt({ hash: txHash });
+  const status = receipt.status === "success" ? "confirmed" : "reverted";
+  if (status === "reverted") {
+    throw new Error(`completeJob tx ${txHash} was mined but reverted onchain`);
+  }
+  return { txHash, status };
 }
 
 export async function rejectJobAndWait(
   jobId: bigint,
   reason: string
 ): Promise<{ txHash: Hash; status: string }> {
-  const pub = getPublicClient();
   const txHash = await escrow.rejectJob(jobId, reason);
-  const receipt = await pub.waitForTransactionReceipt({ hash: txHash });
-  return {
-    txHash,
-    status: receipt.status === "success" ? "confirmed" : "failed",
-  };
+  const pub = getPublicClient();
+  const receipt = await pub.getTransactionReceipt({ hash: txHash });
+  const status = receipt.status === "success" ? "confirmed" : "reverted";
+  if (status === "reverted") {
+    throw new Error(`rejectJob tx ${txHash} was mined but reverted onchain`);
+  }
+  return { txHash, status };
 }

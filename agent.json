@@ -15,6 +15,7 @@
       },
       "supported_tools": [
         "create_job",
+        "set_provider",
         "fund_job",
         "browse_jobs",
         "get_reputation",
@@ -29,7 +30,7 @@
     {
       "name": "AgentLedger Worker",
       "role": "worker",
-      "description": "Job executor — watches marketplace, proposes budgets, executes work using x402 paid APIs, submits deliverables with content validation",
+      "description": "Job executor — watches marketplace, proposes budgets, executes work using x402 paid APIs, encrypts deliverables with AES-256-GCM (sealed delivery), stores on Filecoin, submits with content validation",
       "operator_wallet": "0x273e054f21de7c3C30Fbfa0c282Fe78a8b10c0f8",
       "erc8004_identity": {
         "chain": "ethereum-sepolia",
@@ -43,7 +44,8 @@
         "web_search",
         "fetch_url",
         "enrich_company",
-        "get_job"
+        "get_job",
+        "store_deliverable"
       ],
       "compute_constraints": {
         "max_llm_calls_per_job": 30,
@@ -60,7 +62,7 @@
     {
       "name": "AgentLedger Sentinel",
       "role": "sentinel",
-      "description": "Evaluator + reputation manager — judges deliverables against requirements, completes or rejects jobs, writes ERC-8004 reputation feedback",
+      "description": "Evaluator + reputation manager — decrypts sealed deliverables, judges against requirements, completes or rejects jobs, manages key reveal/withhold, writes ERC-8004 reputation feedback",
       "operator_wallet": "0xd3819A01c741D5B0F0157A7af20824944B0C9A7a",
       "erc8004_identity": {
         "chain": "ethereum-sepolia",
@@ -72,6 +74,7 @@
         "get_job",
         "complete_job",
         "reject_job",
+        "retrieve_deliverable",
         "write_reputation"
       ],
       "compute_constraints": {
@@ -84,11 +87,13 @@
   "tech_stack": [
     "typescript",
     "viem",
-    "gemini-2.0-flash",
+    "groq-llama-3.3-70b-versatile",
     "vercel-ai-sdk",
     "mcp",
     "foundry",
-    "x402"
+    "x402",
+    "openserv",
+    "filecoin-synapse"
   ],
   "blockchain": {
     "primary_chain": "celo-sepolia",
@@ -96,5 +101,10 @@
     "payment_token": "USDC",
     "escrow_standard": "ERC-8183",
     "identity_standard": "ERC-8004"
+  },
+  "security": {
+    "sealed_deliverables": "AES-256-GCM encryption before Filecoin upload; key held by worker, shared with evaluator for quality check, revealed to client only on approval",
+    "receipt_chain": "keccak256 hash-chained execution log — every agent action is tamper-evident, genesis hash derived from agent identity, full chain uploaded to Filecoin",
+    "key_management": "Approval → key revealed to client; Rejection → key withheld, worker IP protected"
   }
 }

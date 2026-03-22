@@ -2,6 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-gray-950 text-gray-100 antialiased;
+:root {
+  --background: 5 5 5;
+  --foreground: 249 250 251;
+  --accent-primary: 16 185 129;
+  --accent-secondary: 59 130 246;
+  --text-muted: 156 163 175;
+  --text-dim: 75 85 99;
+  --card-bg: 17 24 39;
+  --border-color: 31 41 55;
+  --nav-bg: 0 0 0;
+  --grid-opacity: 0.05;
+}
+
+.light {
+  --background: 255 255 255;
+  --foreground: 15 15 15;
+  --accent-primary: 5 120 85; /* Darker emerald for readability */
+  --accent-secondary: 29 78 216;
+  --text-muted: 75 85 99;
+  --text-dim: 156 163 175;
+  --card-bg: 249 250 251;
+  --border-color: 220 220 220;
+  --nav-bg: 255 255 255;
+  --grid-opacity: 0.07;
+}
+
+@layer base {
+  body {
+    @apply bg-[rgb(var(--background))] text-[rgb(var(--foreground))] antialiased selection:bg-emerald-500/30 transition-colors duration-300;
+  }
+}
+
+/* View Transitions API Customization */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+@layer utilities {
+  .text-shadow-glow {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  }
+  
+  .bg-grid {
+    background-image: 
+      linear-gradient(to right, rgba(var(--foreground), var(--grid-opacity)) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(var(--foreground), var(--grid-opacity)) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .bg-scanlines {
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.03) 50%
+    ), linear-gradient(
+      90deg,
+      rgba(var(--accent-primary), 0.01),
+      rgba(var(--accent-primary), 0.005),
+      rgba(var(--accent-primary), 0.01)
+    );
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+}
+
+.cyber-card {
+  @apply relative overflow-hidden transition-all duration-300;
+  background-color: rgb(var(--card-bg) / 0.4);
+  border: 1px solid rgb(var(--border-color) / 0.8);
+  backdrop-filter: blur(12px);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+}
+
+.cyber-card::before {
+  content: "";
+  @apply absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 opacity-0 transition-opacity duration-300;
+}
+
+.cyber-card:hover {
+  @apply border-emerald-500/30;
+  background-color: rgb(var(--card-bg) / 0.7);
+}
+
+.cyber-card:hover::before {
+  @apply opacity-100;
 }

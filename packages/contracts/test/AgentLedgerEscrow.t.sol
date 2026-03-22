@@ -3,6 +3,22 @@ pragma solidity ^0.8.28;
 
 import {TestSetup} from "./helpers/TestSetup.sol";
 import {AgentLedgerEscrow} from "../src/AgentLedgerEscrow.sol";
+import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IACPHook} from "../src/interfaces/IACPHook.sol";
+
+/// @dev A hook that always reverts, used to test try-catch resilience.
+contract RevertingHook is IACPHook, ERC165 {
+    function beforeAction(uint256, bytes4, bytes calldata) external pure {
+        revert("hook-reverted");
+    }
+    function afterAction(uint256, bytes4, bytes calldata) external pure {
+        revert("hook-reverted");
+    }
+    function supportsInterface(bytes4 interfaceId) public view override(ERC165, IERC165) returns (bool) {
+        return interfaceId == type(IACPHook).interfaceId || super.supportsInterface(interfaceId);
+    }
+}
 
 contract AgentLedgerEscrowTest is TestSetup {
     // ─── createJob ──────────────────────────────────────────────────────
@@ -340,7 +356,8 @@ contract AgentLedgerEscrowTest is TestSetup {
         uint256 jobId = _createSubmittedJob();
         uint256 clientBefore = usdc.balanceOf(client);
 
-        vm.warp(block.timestamp + 2 days);
+        // Must warp past expiry (1 day) + grace period (1 day)
+        vm.warp(block.timestamp + 2 days + 1);
         escrow.claimRefund(jobId);
 
         assertEq(usdc.balanceOf(client) - clientBefore, JOB_BUDGET);
@@ -424,23 +441,49 @@ contract AgentLedgerEscrowTest is TestSetup {
         escrow.claimRefund(jobId);
     }
 
-    function test_refundWinsRace() public {
+    function test_submittedRefund_revert_duringGracePeriod() public {
         uint256 jobId = _createSubmittedJob();
-        vm.warp(block.timestamp + 2 days);
+        // Warp past expiry but within grace period (expiry + 12 hours < expiry + 1 day)
+        vm.warp(block.timestamp + 1 days + 12 hours);
 
-        // Refund first
+        // claimRefund reverts because evaluator grace period hasn't elapsed
+        vm.expectRevert(AgentLedgerEscrow.EvaluatorGracePeriod.selector);
         escrow.claimRefund(jobId);
 
-        // Evaluator can't complete
+        // But evaluator can still settle
         vm.prank(evaluator);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                AgentLedgerEscrow.InvalidStatus.selector,
-                AgentLedgerEscrow.JobStatus.Expired,
-                AgentLedgerEscrow.JobStatus.Submitted
-            )
+        escrow.complete(jobId, keccak256("settled-in-grace"), "");
+
+        assertEq(
+            uint256(escrow.getJob(jobId).status),
+            uint256(AgentLedgerEscrow.JobStatus.Completed)
         );
-        escrow.complete(jobId, keccak256("too-late"), "");
+    }
+
+    function test_submittedRefund_afterGracePeriod() public {
+        uint256 jobId = _createSubmittedJob();
+        // Warp past expiry + grace period (1 day expiry + 1 day grace + 1 second)
+        vm.warp(block.timestamp + 2 days + 1);
+
+        uint256 clientBefore = usdc.balanceOf(client);
+        escrow.claimRefund(jobId);
+
+        assertEq(usdc.balanceOf(client) - clientBefore, JOB_BUDGET);
+        assertEq(
+            uint256(escrow.getJob(jobId).status),
+            uint256(AgentLedgerEscrow.JobStatus.Expired)
+        );
+    }
+
+    function test_fundedRefund_noGracePeriod() public {
+        // Funded (not submitted) jobs can be refunded immediately at expiry — no grace
+        uint256 jobId = _createFundedJob();
+        uint256 clientBefore = usdc.balanceOf(client);
+
+        vm.warp(block.timestamp + 1 days + 1);
+        escrow.claimRefund(jobId);
+
+        assertEq(usdc.balanceOf(client) - clientBefore, JOB_BUDGET);
     }
 
     // ─── Fuzz: settlement math ──────────────────────────────────────────
@@ -482,6 +525,76 @@ contract AgentLedgerEscrowTest is TestSetup {
         uint256 providerPayment = budget - platformFee - evaluatorFee;
         assertEq(platformFee + evaluatorFee + providerPayment, budget);
     }
+
+    // ─── Reverting hook resilience ──────────────────────────────────────
+
+    function test_revertingHook_completeStillWorks() public {
+        // Deploy and whitelist a reverting hook
+        RevertingHook badHook = new RevertingHook();
+        escrow.whitelistHook(address(badHook), true);
+
+        // Create job with the reverting hook
+        vm.prank(client);
+        uint256 jobId = escrow.createJob(
+            provider, evaluator, block.timestamp + 1 days, "bad-hook job", address(badHook)
+        );
+
+        vm.prank(provider);
+        escrow.setBudget(jobId, JOB_BUDGET, "");
+
+        vm.prank(client);
+        escrow.fund(jobId, "");
+
+        vm.prank(provider);
+        escrow.submit(jobId, keccak256("work"), "");
+
+        // complete() should succeed despite the reverting hook
+        uint256 providerBefore = usdc.balanceOf(provider);
+        vm.prank(evaluator);
+        escrow.complete(jobId, keccak256("good"), "");
+
+        // Verify settlement happened correctly
+        assertEq(
+            uint256(escrow.getJob(jobId).status),
+            uint256(AgentLedgerEscrow.JobStatus.Completed)
+        );
+        uint256 platformFee = (JOB_BUDGET * PLATFORM_FEE_BP) / 10_000;
+        uint256 evaluatorFee = (JOB_BUDGET * EVALUATOR_FEE_BP) / 10_000;
+        uint256 expectedPayment = JOB_BUDGET - platformFee - evaluatorFee;
+        assertEq(usdc.balanceOf(provider) - providerBefore, expectedPayment);
+    }
+
+    function test_revertingHook_rejectStillWorks() public {
+        RevertingHook badHook = new RevertingHook();
+        escrow.whitelistHook(address(badHook), true);
+
+        vm.prank(client);
+        uint256 jobId = escrow.createJob(
+            provider, evaluator, block.timestamp + 1 days, "bad-hook job", address(badHook)
+        );
+
+        vm.prank(provider);
+        escrow.setBudget(jobId, JOB_BUDGET, "");
+
+        vm.prank(client);
+        escrow.fund(jobId, "");
+
+        vm.prank(provider);
+        escrow.submit(jobId, keccak256("work"), "");
+
+        // reject() should succeed despite the reverting hook
+        uint256 clientBefore = usdc.balanceOf(client);
+        vm.prank(evaluator);
+        escrow.reject(jobId, keccak256("bad"), "");
+
+        assertEq(
+            uint256(escrow.getJob(jobId).status),
+            uint256(AgentLedgerEscrow.JobStatus.Rejected)
+        );
+        assertEq(usdc.balanceOf(client) - clientBefore, JOB_BUDGET);
+    }
+
+    // ─── Fuzz: full refund on reject ─────────────────────────────────────
 
     function testFuzz_rejectFullRefund(uint256 budget) public {
         budget = bound(budget, 1e6, 1_000_000e6);

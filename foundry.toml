@@ -18,3 +18,4 @@ status_testnet = "https://public.sepolia.rpc.status.network"
 [etherscan]
 celo = { key = "${CELOSCAN_API_KEY}", url = "https://api.celoscan.io/api" }
 celo_sepolia = { key = "${CELOSCAN_API_KEY}", url = "https://celo-sepolia.blockscout.com/api" }
+status_testnet = { key = "placeholder", url = "https://sepoliascan.status.network/api" }

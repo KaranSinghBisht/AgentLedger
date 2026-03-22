@@ -4,6 +4,8 @@ import { parseUnits } from "viem";
 import { runAgent, validateContent } from "./base-agent.js";
 import * as escrow from "../tools/escrow.js";
 import { webSearch, fetchUrl, enrichCompany } from "../x402/research.js";
+import { uploadToFilecoin } from "../tools/filecoin.js";
+import { generateSealedKey, sealContent } from "../crypto/sealed.js";
 
 const SYSTEM_PROMPT = `You are the AgentLedger Worker — an AI agent that bids on and executes jobs from the AgentLedger marketplace.
 
@@ -28,9 +30,8 @@ export const workerTools = {
     description: "List open jobs available for bidding",
     parameters: z.object({}),
     execute: async () => {
-      const jobs = await escrow.browseJobs();
+      const jobs = await escrow.browseJobs([0, 1]); // Open + Funded
       return jobs
-        .filter((j) => j.status === 0 || j.status === 1)
         .map((j) => ({
           id: j.id.toString(),
           description: j.description,
@@ -43,20 +44,20 @@ export const workerTools = {
   set_budget: tool({
     description: "Propose a budget for a job (provider-only per ERC-8183)",
     parameters: z.object({
-      jobId: z.number(),
-      amountUsdc: z.string().describe("Budget in USDC"),
+      jobId: z.number().min(0),
+      amountUsdc: z.union([z.string(), z.number()]).transform(Number).pipe(z.number().min(0.01).max(1000)).transform(String).describe("Budget in USDC (e.g. '10' or 10)"),
     }),
     execute: async (params) => {
-      const amount = parseUnits(params.amountUsdc, 6);
+      const amount = parseUnits(String(params.amountUsdc), 6);
       const txHash = await escrow.setBudget(BigInt(params.jobId), amount);
       return { txHash, amount: amount.toString() };
     },
   }),
 
   submit_work: tool({
-    description: "Submit deliverable for a funded job",
+    description: "Submit deliverable for a funded job. Automatically encrypts with AES-256-GCM and stores on Filecoin before submitting hash onchain.",
     parameters: z.object({
-      jobId: z.number(),
+      jobId: z.number().min(0),
       deliverable: z.string().min(150).describe("The completed work output"),
     }),
     execute: async (params) => {
@@ -64,14 +65,39 @@ export const workerTools = {
       if (!validation.valid) {
         return { error: `Content validation failed: ${validation.reason}` };
       }
-      const txHash = await escrow.submitWork(BigInt(params.jobId), params.deliverable);
-      return { txHash };
+      try {
+        // Auto-seal: encrypt + store on Filecoin before submitting
+        let sealedKey: string | undefined;
+        let cid: string | undefined;
+        let sealed = false;
+        try {
+          const key = generateSealedKey();
+          const encrypted = sealContent(params.deliverable, key);
+          const result = await uploadToFilecoin(encrypted);
+          if (result.stored) {
+            sealedKey = key;
+            cid = result.cid;
+            sealed = true;
+          }
+        } catch {
+          // Sealing failed — submit without encryption
+        }
+
+        const txHash = await escrow.submitWork(BigInt(params.jobId), params.deliverable);
+        return { txHash, sealed, sealedKey, cid };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes("InvalidStatus") || msg.includes("revert")) {
+          return { error: `Submit failed (already submitted or wrong status): ${msg.slice(0, 120)}` };
+        }
+        throw err;
+      }
     },
   }),
 
   get_job: tool({
     description: "Get details of a specific job",
-    parameters: z.object({ jobId: z.number() }),
+    parameters: z.object({ jobId: z.number().min(0) }),
     execute: async (params) => {
       const job = await escrow.getJob(BigInt(params.jobId));
       return {
@@ -123,6 +149,28 @@ export const workerTools = {
     execute: async (params) => {
       const result = await enrichCompany(params.domain);
       return result;
+    },
+  }),
+
+  store_deliverable: tool({
+    description: "Encrypt and store deliverable on Filecoin (sealed delivery with AES-256-GCM)",
+    parameters: z.object({
+      content: z.string().min(150).describe("Content to store on Filecoin"),
+    }),
+    execute: async (params) => {
+      try {
+        const sealedKey = generateSealedKey();
+        const encrypted = sealContent(params.content, sealedKey);
+        const result = await uploadToFilecoin(encrypted);
+        if (!result.stored) {
+          return { ...result, sealed: false, sealFailed: "Filecoin upload fell back to hash-only mode" };
+        }
+        return { ...result, sealedKey, sealed: true };
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        const result = await uploadToFilecoin(params.content);
+        return { ...result, sealed: false, sealFailed: reason };
+      }
     },
   }),
 };

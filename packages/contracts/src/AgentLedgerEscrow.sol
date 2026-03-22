@@ -38,6 +38,7 @@ contract AgentLedgerEscrow is ReentrancyGuard {
     address public treasury;
     address public owner;
     uint256 public jobCount;
+    uint256 public constant EVALUATOR_GRACE_PERIOD = 1 days;
 
     mapping(uint256 => Job) internal _jobs;
     mapping(address => bool) public whitelistedHooks;
@@ -62,6 +63,7 @@ contract AgentLedgerEscrow is ReentrancyGuard {
     event PlatformFeeUpdated(uint256 newFeeBP);
     event EvaluatorFeeUpdated(uint256 newFeeBP);
     event TreasuryUpdated(address newTreasury);
+    event HookCallFailed(uint256 indexed jobId, address hook, bool isBefore);
 
     // ─── Errors (9) ─────────────────────────────────────────────────────
 
@@ -74,6 +76,7 @@ contract AgentLedgerEscrow is ReentrancyGuard {
     error BudgetNotSet();
     error HookNotWhitelisted();
     error FeeTooHigh();
+    error EvaluatorGracePeriod();
 
     // ─── Modifiers ──────────────────────────────────────────────────────
 
@@ -311,6 +314,7 @@ contract AgentLedgerEscrow is ReentrancyGuard {
     }
 
     /// @notice Anyone can claim refund after expiry. NOT hookable per ERC-8183.
+    /// @dev Submitted jobs get a grace period so the evaluator can settle first.
     function claimRefund(uint256 jobId) external nonReentrant {
         Job storage job = _jobs[jobId];
         if (block.timestamp < job.expiredAt) revert JobNotExpired();
@@ -322,6 +326,13 @@ contract AgentLedgerEscrow is ReentrancyGuard {
             status == JobStatus.Expired
         ) {
             revert InvalidStatus(status, JobStatus.Open);
+        }
+
+        // Provider already submitted — give evaluator a grace period to settle
+        if (status == JobStatus.Submitted) {
+            if (block.timestamp < job.expiredAt + EVALUATOR_GRACE_PERIOD) {
+                revert EvaluatorGracePeriod();
+            }
         }
 
         uint256 refundAmount = 0;
@@ -374,12 +385,14 @@ contract AgentLedgerEscrow is ReentrancyGuard {
     function _beforeHook(uint256 jobId, bytes memory data) internal {
         address hook = _jobs[jobId].hook;
         if (hook == address(0)) return;
-        IACPHook(hook).beforeAction(jobId, msg.sig, data);
+        try IACPHook(hook).beforeAction(jobId, msg.sig, data) {}
+        catch { emit HookCallFailed(jobId, hook, true); }
     }
 
     function _afterHook(uint256 jobId, bytes memory data) internal {
         address hook = _jobs[jobId].hook;
         if (hook == address(0)) return;
-        IACPHook(hook).afterAction(jobId, msg.sig, data);
+        try IACPHook(hook).afterAction(jobId, msg.sig, data) {}
+        catch { emit HookCallFailed(jobId, hook, false); }
     }
 }

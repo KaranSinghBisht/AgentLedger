@@ -8,7 +8,7 @@ export const celoSepolia = defineChain({
   name: "Celo Sepolia",
   nativeCurrency: { name: "CELO", symbol: "CELO", decimals: 18 },
   rpcUrls: {
-    default: { http: ["https://celo-sepolia.drpc.org"] },
+    default: { http: ["https://forno.celo-sepolia.celo-testnet.org"] },
   },
   blockExplorers: {
     default: { name: "Celoscan", url: "https://sepolia.celoscan.io" },
@@ -17,10 +17,10 @@ export const celoSepolia = defineChain({
 
 // ─── Contract Addresses ────────────────────────────────────────────────────
 
-const ESCROW_ADDRESS: Address =
-  (process.env.NEXT_PUBLIC_ESCROW_ADDRESS as Address) ??
-  (process.env.ESCROW_CONTRACT_ADDRESS as Address) ??
-  "0x0000000000000000000000000000000000000000";
+const ESCROW_ADDRESS: Address = "0x6262a72674F824a2c67fEDE85b56e096eD72B543";
+
+// Block at which the escrow contract was deployed — avoids scanning from genesis
+const ESCROW_DEPLOY_BLOCK = 11_000_000n;
 
 const IDENTITY_REGISTRY: Address = "0x8004A818BFB912233c491871b3d84c89A494BD9e";
 const REPUTATION_REGISTRY: Address = "0x8004B663056A597Dffe9eCcC1965A193B7388713";
@@ -29,12 +29,12 @@ const REPUTATION_REGISTRY: Address = "0x8004B663056A597Dffe9eCcC1965A193B7388713
 
 export const celoClient = createPublicClient({
   chain: celoSepolia,
-  transport: http(),
+  transport: http("https://forno.celo-sepolia.celo-testnet.org", { timeout: 15_000 }),
 });
 
 export const ethSepoliaClient = createPublicClient({
   chain: sepolia,
-  transport: http("https://ethereum-sepolia-rpc.publicnode.com"),
+  transport: http("https://ethereum-sepolia-rpc.publicnode.com", { timeout: 10_000 }),
 });
 
 // ─── Escrow ABI (minimal read-only subset) ─────────────────────────────────
@@ -70,6 +70,34 @@ const escrowAbi = [
       },
     ],
   },
+  // Events for deliverable/settlement display
+  {
+    name: "WorkSubmitted",
+    type: "event",
+    inputs: [
+      { name: "jobId", type: "uint256", indexed: true },
+      { name: "deliverable", type: "bytes32", indexed: false },
+    ],
+  },
+  {
+    name: "JobCompleted",
+    type: "event",
+    inputs: [
+      { name: "jobId", type: "uint256", indexed: true },
+      { name: "reason", type: "bytes32", indexed: false },
+      { name: "providerPayment", type: "uint256", indexed: false },
+      { name: "platformFee", type: "uint256", indexed: false },
+      { name: "evaluatorFee", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    name: "JobRejected",
+    type: "event",
+    inputs: [
+      { name: "jobId", type: "uint256", indexed: true },
+      { name: "reason", type: "bytes32", indexed: false },
+    ],
+  },
 ] as const;
 
 // ─── ERC-8004 ABIs (minimal read-only subset) ──────────────────────────────
@@ -81,13 +109,14 @@ const identityRegistryAbi = [
     stateMutability: "view",
     inputs: [{ name: "agentId", type: "uint256" }],
     outputs: [
-      { name: "uri", type: "string" },
+      { name: "owner", type: "address" },
+      { name: "agentURI", type: "string" },
       {
         name: "metadata",
         type: "tuple[]",
         components: [
-          { name: "key", type: "bytes32" },
-          { name: "value", type: "bytes32" },
+          { name: "key", type: "string" },
+          { name: "value", type: "string" },
         ],
       },
     ],
@@ -108,23 +137,12 @@ const reputationRegistryAbi = [
     stateMutability: "view",
     inputs: [
       { name: "agentId", type: "uint256" },
-      { name: "clients", type: "address[]" },
+      { name: "clientAddresses", type: "address[]" },
     ],
     outputs: [
-      { name: "overallValue", type: "int256" },
-      { name: "overallDecimals", type: "uint256" },
-      { name: "count", type: "uint256" },
-      { name: "uniqueClients", type: "uint256" },
-      {
-        name: "tags",
-        type: "tuple[]",
-        components: [
-          { name: "tag", type: "bytes32" },
-          { name: "value", type: "int256" },
-          { name: "valueDecimals", type: "uint256" },
-          { name: "count", type: "uint256" },
-        ],
-      },
+      { name: "totalFeedbacks", type: "uint256" },
+      { name: "averageValue", type: "int128" },
+      { name: "averageValueDecimals", type: "uint8" },
     ],
   },
 ] as const;
@@ -145,27 +163,29 @@ export interface JobData {
 
 export interface AgentIdentity {
   agentId: number;
+  owner: string;
   uri: string;
   metadata: Array<{ key: string; value: string }>;
 }
 
 export interface ReputationSummary {
   agentId: number;
-  overallValue: string;
-  overallDecimals: number;
-  count: number;
-  uniqueClients: number;
-  tags: Array<{
-    tag: string;
-    value: string;
-    valueDecimals: number;
-    count: number;
-  }>;
+  totalFeedbacks: number;
+  averageValue: string;
+  averageValueDecimals: number;
 }
 
 export interface AgentProfile {
   identity: AgentIdentity;
   reputation: ReputationSummary;
+}
+
+export interface JobEventData {
+  deliverableHash: string | null;
+  providerPayment: string | null;
+  platformFee: string | null;
+  evaluatorFee: string | null;
+  rejectionReason: string | null;
 }
 
 // ─── Escrow Data Fetchers ──────────────────────────────────────────────────
@@ -224,31 +244,88 @@ export async function fetchJob(jobId: number): Promise<JobData | null> {
   }
 }
 
-/** Fetch all jobs via multicall. Returns an array of JobData. */
+/** Fetch events (deliverable submission, settlement) for a specific job. */
+export async function fetchJobEvents(jobId: number): Promise<JobEventData> {
+  const result: JobEventData = {
+    deliverableHash: null,
+    providerPayment: null,
+    platformFee: null,
+    evaluatorFee: null,
+    rejectionReason: null,
+  };
+
+  try {
+    const [submitLogs, completeLogs, rejectLogs] = await Promise.all([
+      celoClient.getContractEvents({
+        address: ESCROW_ADDRESS,
+        abi: escrowAbi,
+        eventName: "WorkSubmitted",
+        args: { jobId: BigInt(jobId) },
+        fromBlock: ESCROW_DEPLOY_BLOCK,
+      }),
+      celoClient.getContractEvents({
+        address: ESCROW_ADDRESS,
+        abi: escrowAbi,
+        eventName: "JobCompleted",
+        args: { jobId: BigInt(jobId) },
+        fromBlock: ESCROW_DEPLOY_BLOCK,
+      }),
+      celoClient.getContractEvents({
+        address: ESCROW_ADDRESS,
+        abi: escrowAbi,
+        eventName: "JobRejected",
+        args: { jobId: BigInt(jobId) },
+        fromBlock: ESCROW_DEPLOY_BLOCK,
+      }),
+    ]);
+
+    if (submitLogs.length > 0) {
+      const args = submitLogs[0].args as { deliverable?: `0x${string}` };
+      result.deliverableHash = args.deliverable ?? null;
+    }
+
+    if (completeLogs.length > 0) {
+      const args = completeLogs[0].args as {
+        providerPayment?: bigint;
+        platformFee?: bigint;
+        evaluatorFee?: bigint;
+      };
+      result.providerPayment = args.providerPayment?.toString() ?? null;
+      result.platformFee = args.platformFee?.toString() ?? null;
+      result.evaluatorFee = args.evaluatorFee?.toString() ?? null;
+    }
+
+    if (rejectLogs.length > 0) {
+      const args = rejectLogs[0].args as { reason?: `0x${string}` };
+      result.rejectionReason = args.reason ?? null;
+    }
+  } catch {
+    // Events may fail on some RPCs; return partial data
+  }
+
+  return result;
+}
+
+/** Fetch all jobs via individual reads. Returns an array of JobData. */
 export async function fetchAllJobs(): Promise<JobData[]> {
   const count = await fetchJobCount();
   if (count === 0) return [];
 
-  try {
-    const calls = Array.from({ length: count }, (_, i) => ({
-      address: ESCROW_ADDRESS,
-      abi: escrowAbi,
-      functionName: "getJob" as const,
-      args: [BigInt(i)],
-    }));
-
-    const results = await celoClient.multicall({ contracts: calls });
-
-    const jobs: JobData[] = [];
-    for (const result of results) {
-      if (result.status === "success" && result.result) {
-        jobs.push(serializeJob(result.result as never));
-      }
+  const jobs: JobData[] = [];
+  for (let i = 0; i < count; i++) {
+    try {
+      const raw = await celoClient.readContract({
+        address: ESCROW_ADDRESS,
+        abi: escrowAbi,
+        functionName: "getJob",
+        args: [BigInt(i)],
+      });
+      jobs.push(serializeJob(raw));
+    } catch {
+      // Individual job read failed — skip
     }
-    return jobs;
-  } catch {
-    return [];
   }
+  return jobs;
 }
 
 // ─── ERC-8004 Data Fetchers ────────────────────────────────────────────────
@@ -258,7 +335,7 @@ export async function fetchAgentIdentity(
   agentId: number
 ): Promise<AgentIdentity | null> {
   try {
-    const [uri, metadata] = await ethSepoliaClient.readContract({
+    const [owner, agentURI, metadata] = await ethSepoliaClient.readContract({
       address: IDENTITY_REGISTRY,
       abi: identityRegistryAbi,
       functionName: "getIdentity",
@@ -267,7 +344,8 @@ export async function fetchAgentIdentity(
 
     return {
       agentId,
-      uri,
+      owner,
+      uri: agentURI,
       metadata: metadata.map((m) => ({
         key: m.key,
         value: m.value,
@@ -290,7 +368,7 @@ export async function fetchAgentReputation(
       args: [BigInt(agentId)],
     });
 
-    const [overallValue, overallDecimals, count, uniqueClients, tags] =
+    const [totalFeedbacks, averageValue, averageValueDecimals] =
       await ethSepoliaClient.readContract({
         address: REPUTATION_REGISTRY,
         abi: reputationRegistryAbi,
@@ -300,16 +378,9 @@ export async function fetchAgentReputation(
 
     return {
       agentId,
-      overallValue: overallValue.toString(),
-      overallDecimals: Number(overallDecimals),
-      count: Number(count),
-      uniqueClients: Number(uniqueClients),
-      tags: tags.map((t) => ({
-        tag: t.tag,
-        value: t.value.toString(),
-        valueDecimals: Number(t.valueDecimals),
-        count: Number(t.count),
-      })),
+      totalFeedbacks: Number(totalFeedbacks),
+      averageValue: averageValue.toString(),
+      averageValueDecimals: Number(averageValueDecimals),
     };
   } catch {
     return null;
@@ -331,11 +402,9 @@ export async function fetchAgentProfile(
     identity,
     reputation: reputation ?? {
       agentId,
-      overallValue: "0",
-      overallDecimals: 0,
-      count: 0,
-      uniqueClients: 0,
-      tags: [],
+      totalFeedbacks: 0,
+      averageValue: "0",
+      averageValueDecimals: 0,
     },
   };
 }

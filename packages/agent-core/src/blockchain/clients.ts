@@ -11,7 +11,7 @@ export function getPublicClient() {
   });
 }
 
-export function getWalletClient(role: "orchestrator" | "worker" | "sentinel") {
+export function getWalletClient(role: "orchestrator" | "worker" | "worker_b" | "sentinel") {
   const env = getEnv();
   const account = privateKeyToAccount(getRoleKey(env, role));
 
@@ -30,7 +30,7 @@ export function getEthSepoliaPublicClient() {
   });
 }
 
-export function getEthSepoliaWalletClient(role: "orchestrator" | "worker" | "sentinel") {
+export function getEthSepoliaWalletClient(role: "orchestrator" | "worker" | "worker_b" | "sentinel") {
   const env = getEnv();
   const account = privateKeyToAccount(getRoleKey(env, role));
 
@@ -41,10 +41,11 @@ export function getEthSepoliaWalletClient(role: "orchestrator" | "worker" | "sen
   });
 }
 
-function getRoleKey(env: ReturnType<typeof getEnv>, role: "orchestrator" | "worker" | "sentinel"): `0x${string}` {
+function getRoleKey(env: ReturnType<typeof getEnv>, role: "orchestrator" | "worker" | "worker_b" | "sentinel"): `0x${string}` {
   const keyMap = {
     orchestrator: env.PRIVATE_KEY,
     worker: env.WORKER_PRIVATE_KEY,
+    worker_b: env.WORKER_B_PRIVATE_KEY ?? env.WORKER_PRIVATE_KEY,
     sentinel: env.SENTINEL_PRIVATE_KEY,
   } as const;
   return keyMap[role] as `0x${string}`;

@@ -20,7 +20,17 @@ broadcast/
 # Build
 dist/
 .next/
+*.tsbuildinfo
 
 # Logs
 *.log
-agent_log.json
+
+# Internal docs (not for submission)
+DEMO_RECORDING_GUIDE.md
+PRE_SUBMISSION_AUDIT.md
+
+# MCP config (has placeholder secrets)
+mcp-config.json
+
+# Deliverables cache
+packages/web/public/deliverables.json

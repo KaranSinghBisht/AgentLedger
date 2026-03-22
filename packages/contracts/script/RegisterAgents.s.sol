@@ -8,8 +8,8 @@ import {IAgentRegistry} from "../src/interfaces/IAgentRegistry.sol";
 /// @dev Each agent uses a DIFFERENT wallet (self-feedback is blocked).
 ///      Usage: forge script packages/contracts/script/RegisterAgents.s.sol --rpc-url celo_sepolia --broadcast
 contract RegisterAgents is Script {
-    // ERC-8004 on Celo (update after confirming deployment)
-    address constant IDENTITY_REGISTRY = address(0); // TODO: set after confirming Celo ERC-8004
+    // ERC-8004 IdentityRegistry on Ethereum Sepolia (agents registered here via TypeScript)
+    address constant IDENTITY_REGISTRY = 0x8004A818BFB912233c491871b3d84c89A494BD9e;
 
     function run() external {
         // Three separate wallets

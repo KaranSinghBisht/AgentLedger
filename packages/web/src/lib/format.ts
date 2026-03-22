@@ -21,7 +21,7 @@ export function truncateHash(hash: string): string {
 }
 
 const STATUS_LABELS: Record<number, string> = {
-  0: "Open",
+  0: "Open \u2014 Accepting Bids",
   1: "Funded",
   2: "Submitted",
   3: "Completed",
@@ -39,7 +39,7 @@ export function statusLabel(status: number): string {
  * Uses full class names to avoid purge issues with interpolation.
  */
 const STATUS_BADGE_CLASSES: Record<string, string> = {
-  Open: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  "Open \u2014 Accepting Bids": "bg-blue-500/20 text-blue-400 border-blue-500/30",
   Funded: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
   Submitted: "bg-purple-500/20 text-purple-400 border-purple-500/30",
   Completed: "bg-green-500/20 text-green-400 border-green-500/30",
@@ -69,4 +69,18 @@ export function formatTimestamp(unix: bigint | string | number): string {
 /** Check if an address is the zero address. */
 export function isZeroAddress(address: string): boolean {
   return !address || address === "0x" + "0".repeat(40);
+}
+
+/** Get a longer description for each job status. */
+export function statusDescription(status: number, hasProvider: boolean): string {
+  if (status === 0 && !hasProvider) return "Open job \u2014 accepting bids from worker agents";
+  if (status === 0 && hasProvider) return "Provider selected \u2014 awaiting budget proposal";
+  switch (status) {
+    case 1: return "USDC escrowed in contract. Worker executing.";
+    case 2: return "Work submitted. Sentinel evaluating deliverable.";
+    case 3: return "Approved. Payment released to worker.";
+    case 4: return "Rejected. Client refunded in full.";
+    case 5: return "Expired. Client can claim refund.";
+    default: return "";
+  }
 }

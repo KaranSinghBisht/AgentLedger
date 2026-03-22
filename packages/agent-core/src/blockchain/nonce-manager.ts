@@ -1,24 +1,37 @@
-import type { Address } from "viem";
+import type { Address, PublicClient } from "viem";
 import { getPublicClient } from "./clients.js";
 
-const nonceCache = new Map<Address, number>();
+// Keyed by "chainId:address" to prevent cross-chain nonce pollution
+const nonceCache = new Map<string, number>();
 
-export async function getNextNonce(address: Address): Promise<number> {
-  const client = getPublicClient();
-  const cached = nonceCache.get(address);
-
-  if (cached !== undefined) {
-    const onChain = await client.getTransactionCount({ address });
-    const next = Math.max(cached, onChain);
-    nonceCache.set(address, next + 1);
-    return next;
-  }
-
-  const nonce = await client.getTransactionCount({ address });
-  nonceCache.set(address, nonce + 1);
-  return nonce;
+function cacheKey(chainId: number, address: Address): string {
+  return `${chainId}:${address}`;
 }
 
-export function resetNonce(address: Address): void {
-  nonceCache.delete(address);
+export async function getNextNonce(address: Address, client?: PublicClient): Promise<number> {
+  const pub = client ?? getPublicClient();
+  const chainId = pub.chain?.id ?? 0;
+  const onChain = await pub.getTransactionCount({ address, blockTag: "pending" });
+  const key = cacheKey(chainId, address);
+  const cached = nonceCache.get(key);
+
+  // Use cache only if it's ahead of on-chain (rapid sequential calls).
+  // If on-chain caught up or surpassed cache (tx confirmed or cache stale from
+  // a failed send), on-chain wins and the cache self-corrects.
+  const next = cached !== undefined && cached > onChain ? cached : onChain;
+  nonceCache.set(key, next + 1);
+  return next;
+}
+
+export function resetNonce(address: Address, chainId?: number): void {
+  if (chainId !== undefined) {
+    nonceCache.delete(cacheKey(chainId, address));
+  } else {
+    // Clear all chains for this address
+    for (const key of nonceCache.keys()) {
+      if (key.endsWith(`:${address}`)) {
+        nonceCache.delete(key);
+      }
+    }
+  }
 }

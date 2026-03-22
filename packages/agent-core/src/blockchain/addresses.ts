@@ -8,24 +8,17 @@ export interface ContractAddresses {
   reputationRegistry?: Address;
 }
 
-// Celo Mainnet
-export const celoMainnet: ContractAddresses = {
-  escrow: "0x0000000000000000000000000000000000000000" as Address, // TODO: deploy
-  hook: "0x0000000000000000000000000000000000000000" as Address,
-  paymentToken: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C" as Address, // USDC
-};
+function requireAddress(envVar: string, name: string): Address {
+  const val = process.env[envVar];
+  if (!val || val === "") throw new Error(`Missing required env var ${envVar} for ${name}`);
+  return val as Address;
+}
 
 // Celo Sepolia Testnet — filled after deployment
 export const celoSepolia: ContractAddresses = {
-  escrow: (process.env.ESCROW_CONTRACT_ADDRESS ?? "0x0000000000000000000000000000000000000000") as Address,
-  hook: (process.env.HOOK_CONTRACT_ADDRESS ?? "0x0000000000000000000000000000000000000000") as Address,
-  paymentToken: (process.env.PAYMENT_TOKEN_ADDRESS ?? "0x0000000000000000000000000000000000000000") as Address,
-};
-
-// ERC-8004 on Celo (if deployed)
-export const erc8004Celo = {
-  identityRegistry: "0x0000000000000000000000000000000000000000" as Address, // TODO
-  reputationRegistry: "0x0000000000000000000000000000000000000000" as Address,
+  escrow: requireAddress("ESCROW_CONTRACT_ADDRESS", "escrow"),
+  hook: requireAddress("HOOK_CONTRACT_ADDRESS", "hook"),
+  paymentToken: requireAddress("PAYMENT_TOKEN_ADDRESS", "paymentToken"),
 };
 
 // ERC-8004 on Ethereum Mainnet (official)
@@ -42,8 +35,6 @@ export const erc8004Sepolia = {
 
 export function getAddresses(chainId: number): ContractAddresses {
   switch (chainId) {
-    case 42220:
-      return celoMainnet;
     case 11142220:
       return celoSepolia;
     default:

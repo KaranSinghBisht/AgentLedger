@@ -42,8 +42,34 @@ The frontend is read-only -- it pulls data from Celo Sepolia for escrow state an
 
 Claude helped prepare the submission artifacts: the agent.json manifest documenting capabilities, compute constraints, and supported tools; the agent_log.json structured execution log showing every decision, tool call, cost, and outcome; and this conversation log. We also verified the Status Network deployment for the $50 gasless bounty -- a single verified contract deployment with proof of gasPrice=0.
 
-Remaining tasks: record the 3-minute demo video, finalize the README with competitive positioning, and submit to Devfolio targeting the Synthesis Open Track plus seven sponsor bounties.
+## Day 4 (March 20) -- Sealed Deliverables and Filecoin Integration
+
+The biggest innovation came from a question: "What if the worker's deliverable is encrypted before submission?" Claude designed what we call Optimistic Information Escrow -- worker encrypts with AES-256-GCM, uploads ciphertext to Filecoin via the Synapse SDK, submits only the keccak256 hash onchain. The Sentinel receives the decryption key to evaluate. On approval, key revealed to client. On rejection, key withheld -- worker IP stays protected. No other agent marketplace does this.
+
+Getting Filecoin working required funding the worker wallet with tFIL (gas) and tUSDFC (storage payments) on Filecoin Calibration testnet. The Synapse SDK needs a USDFC deposit into the Warm Storage payment contract before uploads work. Claude discovered the `storage.prepare()` → `transaction.execute()` flow to auto-deposit. First real upload returned PieceCID `bafkzcib...` -- content permanently stored on Filecoin, encrypted, and retrievable.
+
+We also built hash-chained receipt logs -- every agent action (decision, tool call, error, guardrail) gets a keccak256 hash linking it to the previous entry, creating a tamper-evident audit trail. The full chain is uploaded to Filecoin. This directly strengthens the PL "Agents With Receipts" bounty.
+
+## Day 5 (March 21) -- Competitive Bidding and Marketplace Dynamic
+
+Critical feedback: "The demo shows a scripted single-path flow. Where's the marketplace?" The E2E had one worker pre-assigned to every job. We needed agents competing.
+
+Claude rewrote the E2E from 5 phases to 7: (1) Orchestrator posts an OPEN job with no provider, (2a) Worker A bids 15 USDC, (2b) Worker B bids 25 USDC, (3) Orchestrator queries ERC-8004 reputation for both, compares scores + prices, selects Worker A, calls setProvider onchain, (4) Budget + funding, (5) Research with x402 + sealed Filecoin upload, (6) Rubric-based evaluation + settlement + reputation.
+
+The key design insight: ERC-8183's setBudget() is provider-only by design. Multiple agents can't call setBudget on the same job. So bidding happens off-chain via a bid registry (`marketplace/bid-registry.ts`), and the orchestrator selects a winner before the budget goes onchain. Three new MCP tools -- `submit_bid`, `get_bids`, `select_worker` -- make this accessible to any agent framework.
+
+We also added a structured evaluation rubric to the Sentinel: Completeness (0-25), Accuracy (0-25), Depth (0-25), Format (0-25). Score >= 60 approves. This addresses the ETHMumbai judge critique: "How do you validate agent output?"
+
+## Day 6 (March 22) -- ENS, Polish, and Final Audit
+
+Registered `agentledger.eth` on Sepolia ENS via the ETHRegistrarController (commit-reveal process). Created three subnames -- `orchestrator.agentledger.eth`, `worker.agentledger.eth`, `sentinel.agentledger.eth` -- each with text records for role, capabilities, and protocol via the NameWrapper contract. 19 onchain transactions total for ENS alone.
+
+Claude ran three independent audit passes (Codex GPT-5.4), catching and fixing: console.log pollution in library code, zero-address fallbacks replaced with fail-fast errors, phantom `@ai-sdk/google` dependency removed, MCP feedback hash changed from all-zeros to real keccak256, deploy script renamed from alfajores to celo-sepolia, post-job form now passes real MarketplaceHook address instead of zero address.
+
+Frontend improvements: landing page now shows live onchain stats (job count, completed, total escrowed USDC), 6-step "How It Works" flow, four Synthesis themes, tech stack grid, deployed contract links. Job detail page shows deliverable hash + settlement breakdown (worker/platform/evaluator splits). Agent registry shows all 3 agents with ENS names and onchain stats. Register page explains how any agent can join via MCP.
+
+Final E2E dry run: Job #22, all 7 phases completed, real Filecoin CID returned, rubric evaluation 60/100 approved, settlement 14.55/0.30/0.15 USDC, receipt chain uploaded to Filecoin. Ship it.
 
 ---
 
-*Built by Paracausal Labs with Claude (Anthropic) for The Synthesis, March 2026.*
+*Built solo by Karan Singh Bisht with Claude Code (Anthropic) for The Synthesis, March 2026.*

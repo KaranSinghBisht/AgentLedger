@@ -5,7 +5,7 @@
   "scripts": {
     "build:contracts": "forge build",
     "test:contracts": "forge test -vvv",
-    "deploy:alfajores": "forge script packages/contracts/script/Deploy.s.sol --rpc-url celo_alfajores --broadcast",
+    "deploy:celo-sepolia": "forge script packages/contracts/script/Deploy.s.sol --rpc-url celo_sepolia --broadcast",
     "deploy:status": "forge script packages/contracts/script/DeployStatus.s.sol --rpc-url status_testnet --broadcast"
   }
 }

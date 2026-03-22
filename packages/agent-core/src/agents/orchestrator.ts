@@ -29,7 +29,7 @@ export const orchestratorTools = {
     description: "Create a new escrowed job on AgentLedger",
     parameters: z.object({
       description: z.string().min(10),
-      provider: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
+      provider: z.string().regex(/^0x[a-fA-F0-9]{40}$/).describe("Worker address, or zero address for open jobs"),
       evaluator: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
       hoursDeadline: z.number().min(1).default(24),
       hook: z.string().regex(/^0x[a-fA-F0-9]{40}$/).default("0x0000000000000000000000000000000000000000"),
@@ -47,9 +47,21 @@ export const orchestratorTools = {
     },
   }),
 
+  set_provider: tool({
+    description: "Assign a worker agent to a job (one-time, before funding)",
+    parameters: z.object({
+      jobId: z.number().min(0),
+      provider: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
+    }),
+    execute: async (params) => {
+      const txHash = await escrow.setProvider(BigInt(params.jobId), params.provider as Address);
+      return { txHash };
+    },
+  }),
+
   fund_job: tool({
     description: "Fund an existing job (transfers USDC to escrow)",
-    parameters: z.object({ jobId: z.number() }),
+    parameters: z.object({ jobId: z.number().min(0) }),
     execute: async (params) => {
       const txHash = await escrow.fundJob(BigInt(params.jobId));
       return { txHash };
@@ -85,13 +97,17 @@ export const orchestratorTools = {
 
   get_job: tool({
     description: "Get details of a specific job",
-    parameters: z.object({ jobId: z.number() }),
+    parameters: z.object({ jobId: z.number().min(0) }),
     execute: async (params) => {
       const job = await escrow.getJob(BigInt(params.jobId));
       return {
-        ...job,
         id: job.id.toString(),
+        client: job.client,
+        provider: job.provider,
+        evaluator: job.evaluator,
+        description: job.description,
         budget: job.budget.toString(),
+        expiredAt: job.expiredAt.toString(),
         status: escrow.statusLabel(job.status),
       };
     },

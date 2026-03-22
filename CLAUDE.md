@@ -1,7 +1,7 @@
 # CLAUDE.md — AgentLedger
 
 > **The onchain gig economy where AI agents compete for jobs — escrowed, verified, and reputation-scored.**
-> Built by Paracausal Labs for The Synthesis hackathon (March 13–22, 2026).
+> Built solo by Karan Singh Bisht for The Synthesis hackathon (March 13–22, 2026).
 
 ---
 
@@ -22,18 +22,24 @@ AgentLedger is an open protocol for agent-to-agent commerce on Celo. Users (huma
 
 ### Target Bounties (Priority Order)
 
-| Bounty | Pool | Why We Win |
-|--------|------|-----------|
-| **PL: "Agents With Receipts" (ERC-8004)** | $8,004 | Our ENTIRE platform IS ERC-8004 in production — identity, reputation, validation across registries |
-| **PL: "Let the Agent Cook"** | $8,000 | Our orchestrator agent IS the fully autonomous agent with complete decision loop |
-| **Celo: "Best Agent on Celo"** | $5,000 | Natively deployed on Celo, using cUSD for escrow, leveraging sub-cent fees |
-| **Synthesis Open Track** | $14,475 | Hits 3 of 4 themes: agents that pay, trust, cooperate |
-| **Merit Systems: "Build with AgentCash"** | $1,750 | Worker agents pay for external APIs via x402/AgentCash — load-bearing |
-| **ENS (Identity + Communication + Open)** | $1,500 | Every agent identity resolves to ENS name, all comms use names not addresses |
-| **OpenServ: "Ship Something Real"** | $4,500 | Multi-agent workflows powered by OpenServ SDK |
-| **Status Network: gasless deploy** | $50 | Deploy registry contract + gasless tx on Status testnet — free money |
+| Bounty | Pool (1st/2nd/3rd) | Confidence | Why |
+|--------|------|------------|-----|
+| **Synthesis Open Track** | $28,134 | MEDIUM | All 4 themes, real working product with 36 onchain jobs |
+| **Celo: Best Agent on Celo** | $3,000 / $2,000 | HIGH | Native Celo deployment, viem feeCurrency, USDC escrow |
+| **Virtuals: ERC-8183 Open Build** | $2,000 | HIGH | Our escrow IS ERC-8183. Strongest technical fit |
+| **PL: "Let the Agent Cook"** | $2,000 / $1,500 / $500 | MEDIUM | 7-phase autonomous flow, agent.json, agent_log.json. Weak on ERC-8004 identity |
+| **OpenServ: Ship Something Real** | $2,500 / $1,000 / $1,000 | MEDIUM | 3 agents via OpenServ SDK v2.4 with capabilities, ~10 competitors |
+| **College.xyz: Student Founder's Bet** | 5x $500 + travel | HIGH (if eligible) | Only 4-8 submissions |
+| **ENS: Identity** | $400 / $200 | MEDIUM | agentledger.eth + 3 subnames with text records, 19 real txs |
+| **Status Network: gasless** | $50/team | GUARANTEED | Deployed, gasless tx verified |
 
-**Total addressable:** ~$43,000+ from one coherent project.
+**Dropped tracks (honesty > breadth):** PL Agents w/ Receipts (registry gated, 0 onchain txs), Filecoin Foundation (requires mainnet, we're on calibration), ENS Communication (don't eliminate raw addresses).
+
+**Strategy:** Synthesis + 7 sponsor tracks. Every claim is verifiable.
+
+**College.xyz requirements:** Must be current university student. After submission, verify with: name, school, expected graduation year, active school email (.edu), picture of student ID. Contact @ezveng on Telegram. Also submit on https://www.college.xyz/bounties/26
+
+**Direct competitors to watch:** MoltForge (near-identical, claude-opus-4-6), Nastar Protocol (Celo mainnet marketplace), Agntor (pre-existing startup, 10K+ agents on Base).
 
 ### Four Synthesis Themes We Hit
 
