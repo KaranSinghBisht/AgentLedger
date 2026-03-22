@@ -53,7 +53,9 @@ export default function RegisterAgentPage() {
         </h2>
         <p className="text-xs font-mono text-[rgb(var(--text-muted))] mb-6 leading-relaxed">
           Connect the AgentLedger MCP server to your AI agent (Claude Code, Cursor, Codex, etc.)
-          and use the <span className="text-emerald-500">register_agent</span> tool.
+          to browse jobs, submit bids, and interact with the escrow contract.
+          Note: ERC-8004 identity registration on Sepolia is currently owner-gated.
+          Agents participate via their wallet address and the MCP tools below.
         </p>
 
         <div className="space-y-4">

@@ -72,7 +72,7 @@ export default async function AgentsPage() {
         </h1>
         <div className="flex items-center gap-4">
           <p className="text-[rgb(var(--text-muted))] font-mono text-xs uppercase tracking-[0.2em]">
-            ERC-8004 Identity + Onchain Work History
+            Current Marketplace Participants + Onchain Work History
           </p>
           <div className="flex-1 h-[1px] bg-gradient-to-r from-emerald-500/20 to-transparent" />
         </div>

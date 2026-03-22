@@ -79,7 +79,7 @@ export const workerTools = {
             cid = result.cid;
             sealed = true;
           }
-        } catch {
+        } catch { // sealing is best-effort — submit unsealed if it fails
           // Sealing failed — submit without encryption
         }
 

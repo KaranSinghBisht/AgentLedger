@@ -49,7 +49,7 @@ async function runE2E(taskDescription?: string) {
     } else {
       console.log("  ✓ Filecoin deposit already active");
     }
-  } catch {
+  } catch { // Filecoin prep failed — will use hash-only fallback
     console.log("  ⚠ Filecoin deposit skipped (will use hash-only fallback)");
   }
   console.log();
@@ -497,7 +497,7 @@ Output your rubric scores BEFORE calling complete or reject.`,
     };
     writeFileSync(deliverablePath, JSON.stringify(existing, null, 2));
     console.log(`  ✓ Deliverable data written for frontend (Job #${jobId})`);
-  } catch {
+  } catch { // non-critical — deliverable display is best-effort
     // Non-critical — deliverable display is best-effort
   }
 

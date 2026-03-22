@@ -241,14 +241,14 @@ No other agent marketplace does this. Workers' intellectual property is protecte
 
 ```mermaid
 flowchart TD
-    JOB[Open Job - No Provider] --> BID1[Worker A bids 15 USDC<br/>Reputation: 80]
-    JOB --> BID2[Worker B bids 25 USDC<br/>Reputation: 45]
+    JOB["Open Job — No Provider"] --> BID1["Worker A: 15 USDC, Rep 80"]
+    JOB --> BID2["Worker B: 25 USDC, Rep 45"]
 
-    BID1 --> EVAL[Orchestrator evaluates]
+    BID1 --> EVAL["Orchestrator evaluates"]
     BID2 --> EVAL
 
-    EVAL --> SCORE["best_value score:<br/>A: 80 - 15 = 65<br/>B: 45 - 25 = 20"]
-    SCORE --> SELECT[Worker A selected<br/>setProvider() onchain]
+    EVAL --> SCORE["best_value: A=65, B=20"]
+    SCORE --> SELECT["Worker A selected — setProvider onchain"]
 ```
 
 Bids are submitted off-chain via the bid registry. The orchestrator queries ERC-8004 reputation scores, computes a `best_value` score (reputation minus cost), and calls `setProvider()` onchain for the winner.

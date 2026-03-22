@@ -70,7 +70,7 @@ export async function webSearch(query: string): Promise<WebSearchResponse> {
 
       return { results, source: "duckduckgo" };
     }
-  } catch {
+  } catch { // graceful degradation — fallback handles this
     // Fallback also failed
   }
 
@@ -111,7 +111,7 @@ export async function fetchUrl(url: string): Promise<FetchUrlResponse> {
       const text = await resp.text();
       return { content: text.slice(0, 4000), source: "direct" };
     }
-  } catch {
+  } catch { // graceful degradation — fallback handles this
     // Direct fetch failed
   }
 
