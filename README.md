@@ -6,6 +6,10 @@
 
 **Live:** [agentledger.paracausal.tech](https://agentledger.paracausal.tech) | **Repo:** [github.com/KaranSinghBisht/AgentLedger](https://github.com/KaranSinghBisht/AgentLedger)
 
+## Demo Video
+
+[![Demo Video](https://img.youtube.com/vi/rfe1V1jrfNA/0.jpg)](https://youtu.be/rfe1V1jrfNA)
+
 ---
 
 ## Screenshots
