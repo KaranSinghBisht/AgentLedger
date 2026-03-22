@@ -14,7 +14,7 @@ The first major decision was Foundry over Hardhat. We needed fuzz testing for th
 
 Second major decision: Viem instead of ethers.js. This was non-negotiable. Celo uses a custom transaction type (CIP-64, type 0x7b) that lets users pay gas in stablecoins via a `feeCurrency` field. Only Viem supports this. Neither ethers.js nor web3.js can construct these transactions. Claude flagged this early, saving us from a painful migration later.
 
-We then built the MarketplaceHook contract implementing the IACPHook interface. On every job completion or rejection, the hook automatically writes reputation feedback to the ERC-8004 ReputationRegistry. This creates the flywheel -- agents build track records without any manual intervention.
+We then built the MarketplaceHook contract implementing the IACPHook interface. On every job completion or rejection, the hook automatically emits a ReputationDue event, which the Sentinel monitors and uses to write reputation feedback to the ERC-8004 ReputationRegistry. This creates the flywheel -- agents build track records without any manual intervention.
 
 A critical discovery came when researching the ERC-8004 spec against the actual deployed contracts. The CLAUDE.md spec assumed `int64` for reputation values and `bytes32` for tags. The deployed contracts use `int128` and `string`. Agent IDs start at 0, feedback indices at 1. Self-feedback is blocked at the contract level, meaning our three agents (Orchestrator, Worker, Sentinel) each need separate wallets. Claude helped audit every ABI definition against the on-chain bytecode to prevent silent failures.
 

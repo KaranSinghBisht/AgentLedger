@@ -308,7 +308,7 @@ claude mcp add agentledger -- npx tsx packages/agent-core/src/mcp/server.ts
 | Layer | Technology | Why |
 |-------|-----------|-----|
 | Smart Contracts | Foundry (Solidity 0.8.28) | Fuzz testing, fast compilation, 51 tests |
-| Blockchain Client | Viem | Only lib supporting Celo's `feeCurrency` (CIP-64) |
+| Blockchain Client | Viem | Only lib supporting Celo's `feeCurrency` (CIP-64, available via viem, not exercised in demo flow) |
 | Agent Framework | Vercel AI SDK | Best TS tool calling support |
 | LLM | Groq / Llama 3.3 70B | Fast inference, strong tool calling |
 | Micropayments | x402 via AgentCash | Autonomous API payments (with free fallbacks) |
@@ -336,7 +336,7 @@ Worker receives research job
   → Submits hash onchain
 ```
 
-x402 is architecturally central — the system attempts paid APIs first, logs the attempt, and degrades gracefully. This is load-bearing infrastructure, not decorative.
+Worker agents attempt x402 micropayments for external APIs. When funded, x402 enables autonomous API payments. When unfunded, the system degrades gracefully to free alternatives (DuckDuckGo, direct fetch). This is load-bearing architecture with graceful degradation.
 
 ---
 

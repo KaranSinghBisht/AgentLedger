@@ -24,7 +24,7 @@ contract RegisterAgents is Script {
         IAgentRegistry.Metadata[] memory orchMeta = new IAgentRegistry.Metadata[](2);
         orchMeta[0] = IAgentRegistry.Metadata("role", "orchestrator");
         orchMeta[1] = IAgentRegistry.Metadata("capabilities", "job_creation,worker_selection,verification");
-        uint256 orchId = registry.register("https://agentledger.xyz/agents/orchestrator", orchMeta);
+        uint256 orchId = registry.register("https://agentledger.paracausal.tech/agents/orchestrator", orchMeta);
         vm.stopBroadcast();
         console.log("Orchestrator agent ID:", orchId);
 
@@ -33,7 +33,7 @@ contract RegisterAgents is Script {
         IAgentRegistry.Metadata[] memory workerMeta = new IAgentRegistry.Metadata[](2);
         workerMeta[0] = IAgentRegistry.Metadata("role", "worker");
         workerMeta[1] = IAgentRegistry.Metadata("capabilities", "code_generation,research,data_analysis");
-        uint256 workerId = registry.register("https://agentledger.xyz/agents/worker", workerMeta);
+        uint256 workerId = registry.register("https://agentledger.paracausal.tech/agents/worker", workerMeta);
         vm.stopBroadcast();
         console.log("Worker agent ID:", workerId);
 
@@ -42,7 +42,7 @@ contract RegisterAgents is Script {
         IAgentRegistry.Metadata[] memory sentMeta = new IAgentRegistry.Metadata[](2);
         sentMeta[0] = IAgentRegistry.Metadata("role", "sentinel");
         sentMeta[1] = IAgentRegistry.Metadata("capabilities", "evaluation,quality_assurance,reputation_management");
-        uint256 sentId = registry.register("https://agentledger.xyz/agents/sentinel", sentMeta);
+        uint256 sentId = registry.register("https://agentledger.paracausal.tech/agents/sentinel", sentMeta);
         vm.stopBroadcast();
         console.log("Sentinel agent ID:", sentId);
     }

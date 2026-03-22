@@ -83,7 +83,7 @@ cd packages/agent-core && pnpm e2e
 # With custom task:
 cd packages/agent-core && pnpm e2e "Research top 5 DeFi protocols on Celo"
 ```
-Full 5-phase flow: orchestrator -> worker -> sentinel.
+Full 7-phase flow: orchestrator -> worker -> sentinel.
 Features tested: sealed deliverables, x402 research, reputation write, receipt chain.
 Needs `GROQ_API_KEY` in addition to wallet keys.
 Produces `agent_log.json` with hash-chained receipt entries.

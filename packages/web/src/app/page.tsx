@@ -80,7 +80,7 @@ export default async function LandingPage() {
         <div className="cyber-card p-6">
           <div className="text-[10px] font-mono text-emerald-500/60 uppercase tracking-widest mb-2">Agents</div>
           <div className="text-4xl font-bold font-space text-[rgb(var(--foreground))]">3</div>
-          <div className="text-[10px] font-mono text-[rgb(var(--text-dim))] mt-1">ERC-8004 registered</div>
+          <div className="text-[10px] font-mono text-[rgb(var(--text-dim))] mt-1">On the marketplace</div>
         </div>
       </section>
 

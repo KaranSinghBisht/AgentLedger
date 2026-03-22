@@ -4,7 +4,7 @@ import { uploadToFilecoin } from "../tools/filecoin.js";
 
 const SENSITIVE_KEYS = new Set([
   "privateKey", "private_key", "secret", "password", "token",
-  "apiKey", "api_key", "mnemonic", "seed",
+  "apiKey", "api_key", "mnemonic", "seed", "sealedKey",
 ]);
 
 function sanitize(obj: Record<string, unknown>): Record<string, unknown> {
